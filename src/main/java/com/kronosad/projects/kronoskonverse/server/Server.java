@@ -28,7 +28,7 @@ public class Server {
     protected User serverUser;
     protected ArrayList<NetworkUser> users = new ArrayList<NetworkUser>();
 
-    private boolean running = false;
+    protected boolean running = false;
 
 
 
@@ -64,13 +64,23 @@ public class Server {
             System.err.println("There was a problem binding to port: " + port);
         }
 
-        while(true){
+        while(running){
             Scanner in = new Scanner(System.in);
             String response = in.nextLine();
 
             if(response.equalsIgnoreCase("stop")){
                 try {
                     System.out.println("Stopping server...");
+                    ChatMessage chatMessage = new ChatMessage();
+                    chatMessage.setMessage("[WARNING: Server is shutting down, disconnecting all clients!]");
+                    chatMessage.setUser(this.serverUser);
+                    Packet02ChatMessage chatPacket = new Packet02ChatMessage(Packet.Initiator.SERVER, chatMessage);
+                    sendPacketToClients(chatPacket);
+
+                    for(NetworkUser user : users){
+                        user.getSocket().close();
+                    }
+
                     this.server.close();
                     running = false;
                     break;

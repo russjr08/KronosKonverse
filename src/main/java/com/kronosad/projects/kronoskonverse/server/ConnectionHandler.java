@@ -39,7 +39,7 @@ public class ConnectionHandler implements Runnable {
 
     @Override
     public void run() {
-        while (true){
+        while (server.running){
             try {
                 BufferedReader inputStream = new BufferedReader(new InputStreamReader(client.getInputStream()));
 
