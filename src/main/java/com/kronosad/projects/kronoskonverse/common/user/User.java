@@ -1,5 +1,6 @@
 package com.kronosad.projects.kronoskonverse.common.user;
 
+import com.google.gson.Gson;
 import com.kronosad.projects.kronoskonverse.common.interfaces.INetworkable;
 
 import java.util.UUID;
@@ -14,7 +15,7 @@ import java.util.UUID;
  * Base User class, all Users should extend this class.
  * @see com.kronosad.projects.kronoskonverse.common.interfaces.INetworkable
  */
-public abstract class User implements INetworkable {
+public class User implements INetworkable {
 
     protected String username;
 
@@ -45,5 +46,10 @@ public abstract class User implements INetworkable {
      */
     public boolean isElevated() {
         return elevated;
+    }
+
+    @Override
+    public String toJSON() {
+        return new Gson().toJson(this);
     }
 }

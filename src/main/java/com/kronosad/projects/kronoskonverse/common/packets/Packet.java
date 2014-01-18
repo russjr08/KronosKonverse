@@ -98,6 +98,8 @@ public class Packet implements INetworkable {
         return current == correctInitiator;
     }
 
-
-
+    @Override
+    public String toString() {
+        return toJSON();
+    }
 }

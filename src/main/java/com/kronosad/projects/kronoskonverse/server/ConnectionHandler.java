@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.kronosad.projects.kronoskonverse.common.packets.Packet;
 import com.kronosad.projects.kronoskonverse.common.packets.Packet00Handshake;
 import com.kronosad.projects.kronoskonverse.common.packets.Packet01LoggedIn;
+import com.kronosad.projects.kronoskonverse.common.packets.Packet02ChatMessage;
 import com.kronosad.projects.kronoskonverse.server.implementation.NetworkUser;
 
 import java.io.BufferedReader;
@@ -23,6 +24,8 @@ public class ConnectionHandler implements Runnable {
     private Server server;
     private Socket client;
     private Gson prettyGson;
+
+    private NetworkUser user;
 
     public ConnectionHandler(Server server, Socket client){
         this.server = server;
@@ -51,7 +54,7 @@ public class ConnectionHandler implements Runnable {
 
                         if(handshake.getVersion().getProtocol().equalsIgnoreCase(server.getVersion().getProtocol())){
 
-                            NetworkUser user = new NetworkUser(client, handshake.getMessage().split("-")[1], UUID.randomUUID(), false);
+                            user = new NetworkUser(client, handshake.getMessage().split("-")[1], UUID.randomUUID(), false);
 
                             System.out.println("User connected!");
                             System.out.println(prettyGson.toJson(user));
@@ -67,13 +70,24 @@ public class ConnectionHandler implements Runnable {
                             System.err.println("Version mismatch! Disconnecting client!");
                             client.close();
                         }
+                        break;
                     case 1:
+                        break;
+                    case 2:
+                        Packet02ChatMessage chat = new Gson().fromJson(response, Packet02ChatMessage.class);
 
+                        for(NetworkUser users : server.users){
+                            PrintWriter writer = new PrintWriter(users.getSocket().getOutputStream(), true);
+                            writer.println(chat);
+                        }
                 }
 
             } catch (IOException e) {
                 e.printStackTrace();
+                System.out.println("Client disconnected: " + prettyGson.toJson(user));
+                server.users.remove(user);
             }
         }
+
     }
 }

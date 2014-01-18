@@ -22,10 +22,11 @@ public class NetworkUser extends User{
         this.elevated = elevated;
     }
 
+    public Socket getSocket() {
+        return socket;
+    }
 
-
-
-//    @Override
+    //    @Override
 //    public INetworkable fromJSON(String json) {
 //        return new Gson().fromJson(json, NetworkUser.class);
 //    }

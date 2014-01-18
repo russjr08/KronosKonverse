@@ -2,10 +2,12 @@ package com.kronosad.projects.kronoskonverse.client;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.kronosad.projects.kronoskonverse.common.objects.ChatMessage;
 import com.kronosad.projects.kronoskonverse.common.objects.Version;
 import com.kronosad.projects.kronoskonverse.common.packets.Packet;
 import com.kronosad.projects.kronoskonverse.common.packets.Packet00Handshake;
 import com.kronosad.projects.kronoskonverse.common.packets.Packet01LoggedIn;
+import com.kronosad.projects.kronoskonverse.common.packets.Packet02ChatMessage;
 import com.kronosad.projects.kronoskonverse.server.implementation.NetworkUser;
 
 import java.io.BufferedReader;
@@ -13,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.Scanner;
 
 /**
  * User: russjr08
@@ -48,6 +51,23 @@ public class Client implements Runnable {
             e.printStackTrace();
             System.err.println("Error connecting to server!");
         }
+
+        Scanner in = new Scanner(System.in);
+        while(true){
+            ChatMessage message = new ChatMessage();
+            message.setMessage(in.nextLine());
+            message.setUser(this.user);
+
+            Packet02ChatMessage chatPacket = new Packet02ChatMessage(Packet.Initiator.CLIENT, message);
+
+            try {
+                PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+                out.println(chatPacket.toJSON());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
     }
     public static void main(String... args){
         new Client();
@@ -71,6 +91,11 @@ public class Client implements Runnable {
 
                     user = (NetworkUser) loggedIn.getUser();
 
+                }
+                if(packet.getId() == 02){
+                    Packet02ChatMessage chatMessage = new Gson().fromJson(response, Packet02ChatMessage.class);
+
+                    System.out.println("[" + chatMessage.getChat().getUser().getUsername() + "] " + chatMessage.getChat().getMessage());
                 }
 
             } catch (IOException e) {
