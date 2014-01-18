@@ -263,8 +263,13 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
                         }
                         System.out.println("Removed " + change.getUser().getUsername());
                     } else if(change.getMessage().equalsIgnoreCase("add")){
-                        loggedInUsers.add(change.getUser());
-                        System.out.println("Added " + change.getUser().getUsername());
+                        // The server will send everyone a Packet03UserListChange, we want to ignore it if it is from us
+                        // joining.
+                        if(!change.getUser().getUsername().equals(user.getUsername())){
+                            loggedInUsers.add(change.getUser());
+                            System.out.println("Added " + change.getUser().getUsername());
+                        }
+
 
                     } else {
                         System.out.println("Unrecognized packet received! " + packet.toJSON());
