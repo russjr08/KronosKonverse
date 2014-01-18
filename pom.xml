@@ -7,7 +7,33 @@
     <groupId>com.kronosad</groupId>
     <artifactId>KronosKonverse</artifactId>
     <version>1.0</version>
+    <profiles>
+        <profile>
+            <id>api</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <executions>
 
+                            <execution>
+                                <id>api</id>
+                                <goals><goal>jar</goal></goals>
+                                <phase>package</phase>
+                                <configuration>
+                                    <classifier>api</classifier>
+                                    <includes>
+                                        <include>src/main/java/com/kronosad/projects/kronoskonverse/common</include>
+                                    </includes>
+
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
     <build>
         <plugins>
             <plugin>
@@ -44,6 +70,8 @@
                     <target>1.6</target>
                 </configuration>
             </plugin>
+
+
         </plugins>
     </build>
 
