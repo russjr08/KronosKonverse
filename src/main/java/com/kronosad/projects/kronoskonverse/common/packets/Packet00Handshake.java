@@ -17,6 +17,7 @@ public class Packet00Handshake extends Packet {
 
     public Packet00Handshake(Initiator initiator, String username) {
         super(Initiator.CLIENT);
+        setId(0);
 
         if(initiator != Initiator.CLIENT){
             throw new IllegalArgumentException("The Initiator of this Packet MUST be the client!");
