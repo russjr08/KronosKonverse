@@ -34,7 +34,7 @@ public class Client implements Runnable {
 
     private Client(){
         try {
-            socket = new Socket("localhost", 8081);
+            socket = new Socket("localhost", 9090);
             Packet00Handshake handshake = new Packet00Handshake(Packet.Initiator.CLIENT, "russjr08");
             handshake.setVersion(version);
 

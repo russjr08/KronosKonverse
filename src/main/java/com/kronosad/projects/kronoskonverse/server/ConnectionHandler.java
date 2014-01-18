@@ -41,9 +41,16 @@ public class ConnectionHandler implements Runnable {
         while (true){
             try {
                 BufferedReader inputStream = new BufferedReader(new InputStreamReader(client.getInputStream()));
+
                 String response = inputStream.readLine();
                 Packet packet = new Gson().fromJson(response, Packet.class);
 
+                if(response == null){
+                    System.out.println("Client disconnected: " + user.getUsername());
+                    server.users.remove(user);
+                    client.close();
+                    break;
+                }
                 switch(packet.getId()){
                     case 0:
                         System.out.println("Parsing handshake packet!");
