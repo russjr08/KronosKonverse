@@ -1,7 +1,10 @@
 package com.kronosad.projects.kronoskonverse.server;
 
+import com.kronosad.projects.kronoskonverse.server.implementation.NetworkUser;
+
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.util.ArrayList;
 
 /**
  * User: russjr08
@@ -12,6 +15,8 @@ public class Server {
     private int port;
 
     private ServerSocket server;
+
+    private ArrayList<NetworkUser> users = new ArrayList<NetworkUser>();
 
 
 

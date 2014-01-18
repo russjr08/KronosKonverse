@@ -1,6 +1,9 @@
 package com.kronosad.projects.kronoskonverse.common.packets;
 
+import com.google.gson.Gson;
 import com.kronosad.projects.kronoskonverse.common.interfaces.INetworkable;
+
+import java.io.Serializable;
 
 /**
  * User: russjr08
@@ -12,7 +15,7 @@ import com.kronosad.projects.kronoskonverse.common.interfaces.INetworkable;
  * An abstract class representing 'Packets' (Not real packets, TCP is stream-based.) sent across the network.
  * @see com.kronosad.projects.kronoskonverse.common.interfaces.INetworkable
  */
-public abstract class Packet implements INetworkable {
+public class Packet implements INetworkable {
     protected Initiator initiator = Initiator.UNKNOWN;
 
     protected int id;
@@ -20,11 +23,17 @@ public abstract class Packet implements INetworkable {
     protected INetworkable payload;
 
     /**
+     * @deprecated Do not use this constructor, it's only meant to be used for deserialization/GSON purposes!
+     */
+    private Packet(){}
+
+    /**
      * All Packets should be constructed with an {@link com.kronosad.projects.kronoskonverse.common.packets.Packet.Initiator} as the parameter.
      * @param initiator Initiator of said Packet.
      */
-    public Packet(Initiator initiator){
+    public Packet(Initiator initiator, int id){
         this.initiator = initiator;
+        this.id = id;
     }
 
     /**
@@ -81,10 +90,20 @@ public abstract class Packet implements INetworkable {
         return payload;
     }
 
+    @Override
+    public INetworkable fromJSON(String json) {
+        return new Gson().fromJson(json, Packet.class);
+    }
+
+    @Override
+    public String toJSON() {
+        return new Gson().toJson(this);
+    }
+
     /**
      * The side who first sent this packet.
      */
-    public enum Initiator{
+    public enum Initiator implements Serializable{
         SERVER, CLIENT, UNKNOWN
     }
 

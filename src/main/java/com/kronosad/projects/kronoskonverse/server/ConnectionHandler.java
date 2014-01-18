@@ -42,6 +42,7 @@ public class ConnectionHandler implements Runnable {
             if(packet.getId() == 0){
                 System.out.println("Parsing handshake packet!");
                 Packet00Handshake handshake = new Gson().fromJson(response, Packet00Handshake.class);
+                System.out.println(prettyGson.toJson(handshake));
 
                 NetworkUser user = new NetworkUser(client, handshake.getMessage().split("-")[1], UUID.randomUUID(), false);
 
