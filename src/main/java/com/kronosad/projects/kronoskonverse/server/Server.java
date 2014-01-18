@@ -63,8 +63,19 @@ public class Server {
 
         while(true){
             Scanner in = new Scanner(System.in);
+            String response = in.nextLine();
+
+            if(response.equalsIgnoreCase("stop")){
+                try {
+                    System.out.println("Stopping server...");
+                    this.server.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
             ChatMessage message = new ChatMessage();
-            message.setMessage(in.nextLine());
+            message.setMessage(response);
             message.setUser(serverUser);
 
             Packet02ChatMessage packet02ChatMessage = new Packet02ChatMessage(Packet.Initiator.SERVER, message);
