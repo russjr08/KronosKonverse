@@ -1,7 +1,6 @@
 package com.kronosad.projects.kronoskonverse.server.implementation;
 
 import com.google.gson.Gson;
-import com.kronosad.projects.kronoskonverse.common.interfaces.INetworkable;
 import com.kronosad.projects.kronoskonverse.common.user.User;
 
 import java.net.Socket;
@@ -26,10 +25,10 @@ public class NetworkUser extends User{
 
 
 
-    @Override
-    public INetworkable fromJSON(String json) {
-        return new Gson().fromJson(json, NetworkUser.class);
-    }
+//    @Override
+//    public INetworkable fromJSON(String json) {
+//        return new Gson().fromJson(json, NetworkUser.class);
+//    }
 
     @Override
     public String toJSON() {

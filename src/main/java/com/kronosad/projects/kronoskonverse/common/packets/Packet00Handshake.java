@@ -1,7 +1,6 @@
 package com.kronosad.projects.kronoskonverse.common.packets;
 
-import com.google.gson.Gson;
-import com.kronosad.projects.kronoskonverse.common.interfaces.INetworkable;
+import com.kronosad.projects.kronoskonverse.common.objects.Version;
 
 /**
  * User: russjr08
@@ -15,6 +14,8 @@ import com.kronosad.projects.kronoskonverse.common.interfaces.INetworkable;
  */
 public class Packet00Handshake extends Packet {
 
+    private Version version;
+
     public Packet00Handshake(Initiator initiator, String username) {
         super(Initiator.CLIENT, 0);
 
@@ -26,13 +27,11 @@ public class Packet00Handshake extends Packet {
 
     }
 
-    @Override
-    public INetworkable fromJSON(String json) {
-        return new Gson().fromJson(json, Packet.class);
+    public Version getVersion() {
+        return version;
     }
 
-    @Override
-    public String toJSON() {
-        return new Gson().toJson(this);
+    public void setVersion(Version version) {
+        this.version = version;
     }
 }

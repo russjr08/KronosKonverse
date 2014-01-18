@@ -13,12 +13,13 @@ import java.io.Serializable;
  */
 public interface INetworkable extends Serializable{
 
-    /**
-     * This method should deserialize any objects sent over the network.
-     * @param json The JSON-serialized version of this object.
-     * @return An instance of {@link com.kronosad.projects.kronoskonverse.common.interfaces.INetworkable}
-     */
-    public INetworkable fromJSON(String json);
+//    /**
+//     * This method should deserialize any objects sent over the network.
+//     * @param json The JSON-serialized version of this object.
+//     * @return An instance of {@link INetworkable}
+//     */
+//    public INetworkable fromJSON(String json);
+
     public String toJSON();
 
 }

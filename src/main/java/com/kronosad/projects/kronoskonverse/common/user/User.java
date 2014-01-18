@@ -14,7 +14,7 @@ import java.util.UUID;
  * Base User class, all Users should extend this class.
  * @see com.kronosad.projects.kronoskonverse.common.interfaces.INetworkable
  */
-public abstract class User implements INetworkable{
+public abstract class User implements INetworkable {
 
     protected String username;
 

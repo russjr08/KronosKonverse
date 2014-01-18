@@ -1,5 +1,6 @@
 package com.kronosad.projects.kronoskonverse.server;
 
+import com.kronosad.projects.kronoskonverse.common.objects.Version;
 import com.kronosad.projects.kronoskonverse.server.implementation.NetworkUser;
 
 import java.io.IOException;
@@ -15,8 +16,9 @@ public class Server {
     private int port;
 
     private ServerSocket server;
+    private Version version = new Version().setProtocol("1.0-ALPHA").setReadable("1.0 Alpha");
 
-    private ArrayList<NetworkUser> users = new ArrayList<NetworkUser>();
+    protected ArrayList<NetworkUser> users = new ArrayList<NetworkUser>();
 
 
 
@@ -45,6 +47,10 @@ public class Server {
                 e.printStackTrace();
             }
         }
+    }
+
+    public Version getVersion() {
+        return version;
     }
 
     public static void main(String[] args){

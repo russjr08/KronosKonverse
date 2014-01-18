@@ -52,13 +52,7 @@ public class Packet implements INetworkable {
         this.message = message;
     }
 
-    /**
-     * Data of this Packet, which should be {@link java.io.Serializable} / {@link com.kronosad.projects.kronoskonverse.common.interfaces.INetworkable}
-     * @param payload Data of the Packet.
-     */
-    public void setPayload(INetworkable payload) {
-        this.payload = payload;
-    }
+
 
     /**
      * @return The {@link com.kronosad.projects.kronoskonverse.common.packets.Packet.Initiator} of who sent this Packet.
@@ -82,18 +76,11 @@ public class Packet implements INetworkable {
         return message;
     }
 
-    /**
-     * The data that this packet contains, the data should be {@link java.io.Serializable} / {@link com.kronosad.projects.kronoskonverse.common.interfaces.INetworkable}
-     * @return The data that this packet contains.
-     */
-    public INetworkable getPayload() {
-        return payload;
-    }
 
-    @Override
-    public INetworkable fromJSON(String json) {
-        return new Gson().fromJson(json, Packet.class);
-    }
+//    @Override
+//    public INetworkable fromJSON(String json) {
+//        return new Gson().fromJson(json, Packet.class);
+//    }
 
     @Override
     public String toJSON() {
@@ -105,6 +92,10 @@ public class Packet implements INetworkable {
      */
     public enum Initiator implements Serializable{
         SERVER, CLIENT, UNKNOWN
+    }
+
+    protected boolean assertInitiator(Initiator current, Initiator correctInitiator){
+        return current == correctInitiator;
     }
 
 
