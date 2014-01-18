@@ -28,6 +28,8 @@ public class Server {
     protected User serverUser;
     protected ArrayList<NetworkUser> users = new ArrayList<NetworkUser>();
 
+    private boolean running = false;
+
 
 
     public Server(int port){
@@ -55,6 +57,7 @@ public class Server {
         try {
             server = new ServerSocket(port);
             System.out.println("Sucessfully bounded to port!");
+            running = true;
             serve();
         } catch (IOException e) {
             e.printStackTrace();
@@ -69,6 +72,8 @@ public class Server {
                 try {
                     System.out.println("Stopping server...");
                     this.server.close();
+                    running = false;
+                    break;
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -104,7 +109,7 @@ public class Server {
     public void serve(){
         new Thread(){
             public void run(){
-                while (true){
+                while (running){
                     try {
                         new ConnectionHandler(Server.this, server.accept());
                     } catch (IOException e) {
