@@ -89,7 +89,7 @@ public class Client implements Runnable {
                     System.out.println("Received Logged In packet! Parsing now...");
                     System.out.println(prettyGson.toJson(loggedIn));
 
-                    user = (NetworkUser) loggedIn.getUser();
+                    user = loggedIn.getUser();
 
                 }
                 if(packet.getId() == 02){
