@@ -3,8 +3,6 @@ package com.kronosad.projects.kronoskonverse.common.user;
 import com.google.gson.Gson;
 import com.kronosad.projects.kronoskonverse.common.interfaces.INetworkable;
 
-import java.util.UUID;
-
 /**
  * User: russjr08
  * Date: 1/17/14
@@ -19,7 +17,7 @@ public class User implements INetworkable {
 
     protected String username;
 
-    protected UUID uuid;
+    protected String uuid;
 
     protected boolean elevated = false;
 
@@ -35,7 +33,7 @@ public class User implements INetworkable {
      * Returns a Unique Identifier of this User.
      * @return UUID of this User.
      */
-    public UUID getUuid() {
+    public String getUuid() {
         return uuid;
     }
 

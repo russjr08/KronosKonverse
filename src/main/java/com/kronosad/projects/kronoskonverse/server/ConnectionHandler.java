@@ -2,10 +2,8 @@ package com.kronosad.projects.kronoskonverse.server;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.kronosad.projects.kronoskonverse.common.packets.Packet;
-import com.kronosad.projects.kronoskonverse.common.packets.Packet00Handshake;
-import com.kronosad.projects.kronoskonverse.common.packets.Packet01LoggedIn;
-import com.kronosad.projects.kronoskonverse.common.packets.Packet02ChatMessage;
+import com.kronosad.projects.kronoskonverse.common.objects.ChatMessage;
+import com.kronosad.projects.kronoskonverse.common.packets.*;
 import com.kronosad.projects.kronoskonverse.server.implementation.NetworkUser;
 
 import java.io.BufferedReader;
@@ -27,12 +25,15 @@ public class ConnectionHandler implements Runnable {
 
     private NetworkUser user;
 
+    private Thread manage;
+
     public ConnectionHandler(Server server, Socket client){
         this.server = server;
         this.client = client;
         prettyGson = new GsonBuilder().setPrettyPrinting().create();
 
-        new Thread(this).start();
+        manage = new Thread(this);
+        manage.start();
     }
 
 
@@ -48,7 +49,18 @@ public class ConnectionHandler implements Runnable {
                 if(response == null){
                     System.out.println("Client disconnected: " + user.getUsername());
                     server.users.remove(user);
+                    Packet03UserListChange change = new Packet03UserListChange(Packet.Initiator.SERVER, user);
+
+                    change.setMessage("remove");
+                    server.sendPacketToClients(change);
                     client.close();
+
+                    ChatMessage message = new ChatMessage();
+                    message.setMessage(user.getUsername() + " has left.");
+                    message.setUser(server.serverUser);
+
+                    Packet02ChatMessage chatPacket = new Packet02ChatMessage(Packet.Initiator.SERVER, message);
+                    server.sendPacketToClients(chatPacket);
                     break;
                 }
                 switch(packet.getId()){
@@ -65,13 +77,29 @@ public class ConnectionHandler implements Runnable {
 
                             System.out.println("User connected!");
                             System.out.println(prettyGson.toJson(user));
+                            server.users.add(user);
+
                             PrintWriter writer = new PrintWriter(client.getOutputStream(), true);
 
-                            Packet01LoggedIn loggedIn = new Packet01LoggedIn(Packet.Initiator.SERVER, user);
+                            Packet01LoggedIn loggedIn = new Packet01LoggedIn(Packet.Initiator.SERVER, user, server.users);
 
                             writer.println(loggedIn.toJSON());
 
-                            server.users.add(user);
+                            Packet03UserListChange change = new Packet03UserListChange(Packet.Initiator.SERVER, user);
+
+                            change.setMessage("add");
+
+                            server.sendPacketToClients(change);
+
+                            ChatMessage message = new ChatMessage();
+                            message.setMessage(user.getUsername() + " has joined!");
+                            message.setUser(server.serverUser);
+
+                            Packet02ChatMessage chatPacket = new Packet02ChatMessage(Packet.Initiator.SERVER, message);
+
+                            server.sendPacketToClients(chatPacket);
+
+
 
                         }else{
                             System.err.println("Version mismatch! Disconnecting client!");
@@ -83,10 +111,7 @@ public class ConnectionHandler implements Runnable {
                     case 2:
                         Packet02ChatMessage chat = new Gson().fromJson(response, Packet02ChatMessage.class);
 
-                        for(NetworkUser users : server.users){
-                            PrintWriter writer = new PrintWriter(users.getSocket().getOutputStream(), true);
-                            writer.println(chat);
-                        }
+                        server.sendPacketToClients(chat);
                 }
 
             } catch (IOException e) {

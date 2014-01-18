@@ -18,7 +18,7 @@ public class NetworkUser extends User{
     public NetworkUser(Socket socket, String name,  UUID uuid, boolean elevated){
         this.socket = socket;
         this.username = name;
-        this.uuid = uuid;
+        this.uuid = uuid.toString();
         this.elevated = elevated;
     }
 

@@ -22,6 +22,7 @@ import java.util.Scanner;
  * Date: 1/17/14
  * Time: 6:40 PM
  */
+@Deprecated
 public class Client implements Runnable {
     private static Socket socket;
     private static Version version = new Version().setProtocol("1.0-ALPHA").setReadable("1.0 Alpha");

@@ -10,12 +10,10 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.kronosad.projects.kronoskonverse.common.objects.ChatMessage;
 import com.kronosad.projects.kronoskonverse.common.objects.Version;
-import com.kronosad.projects.kronoskonverse.common.packets.Packet;
-import com.kronosad.projects.kronoskonverse.common.packets.Packet00Handshake;
-import com.kronosad.projects.kronoskonverse.common.packets.Packet01LoggedIn;
-import com.kronosad.projects.kronoskonverse.common.packets.Packet02ChatMessage;
+import com.kronosad.projects.kronoskonverse.common.packets.*;
 import com.kronosad.projects.kronoskonverse.server.implementation.NetworkUser;
 
+import javax.swing.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.BufferedReader;
@@ -23,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
 
 /**
  *
@@ -34,12 +33,17 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
 
     private static Version version = new Version().setProtocol("1.0-ALPHA").setReadable("1.0 Alpha");
 
+    private DefaultListModel usersList = new DefaultListModel();
 
     private Gson prettyGson = new GsonBuilder().setPrettyPrinting().create();
 
     private NetworkUser user;
 
     private Thread receive;
+
+    boolean disconnected = false;
+
+    private ArrayList<NetworkUser> loggedInUsers = new ArrayList<NetworkUser>();
 
     /**
      * Creates new form WindowChat
@@ -73,6 +77,9 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
             }
         });
 
+        listUsers.setModel(usersList);
+
+
     }
 
     private void handshake(){
@@ -93,9 +100,8 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
     }
 
     public void addToChat(String text){
-        this.txtSentMessages.append(text + "\n");
-        this.txtSentMessages.setCaretPosition(this.txtSentMessages.getText().length());
-        this.txtMessage.setText("");
+        txtSentMessages.append(text + "\n");
+        txtMessage.setText("");
     }
 
 
@@ -109,21 +115,14 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jScrollPane1 = new javax.swing.JScrollPane();
-        txtSentMessages = new javax.swing.JTextArea();
         jScrollPane2 = new javax.swing.JScrollPane();
         listUsers = new javax.swing.JList();
         btnSend = new javax.swing.JButton();
         txtMessage = new javax.swing.JTextField();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        txtSentMessages = new javax.swing.JTextArea();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-
-        txtSentMessages.setEditable(false);
-        txtSentMessages.setColumns(20);
-        txtSentMessages.setLineWrap(true);
-        txtSentMessages.setRows(5);
-        txtSentMessages.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        jScrollPane1.setViewportView(txtSentMessages);
 
         jScrollPane2.setViewportView(listUsers);
 
@@ -137,6 +136,11 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
         txtMessage.setText("Type your thoughts here!");
         txtMessage.setCursor(new java.awt.Cursor(java.awt.Cursor.TEXT_CURSOR));
 
+        txtSentMessages.setEditable(false);
+        txtSentMessages.setColumns(20);
+        txtSentMessages.setRows(5);
+        jScrollPane1.setViewportView(txtSentMessages);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -144,8 +148,8 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(txtMessage)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 482, Short.MAX_VALUE))
+                    .addComponent(txtMessage, javax.swing.GroupLayout.DEFAULT_SIZE, 482, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
@@ -174,7 +178,17 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
 
     }//GEN-LAST:event_btnSendActionPerformed
 
+    public void updateUsers(){
+        usersList.clear();
+        usersList.removeAllElements();
+        for(NetworkUser logged : loggedInUsers){
+            usersList.addElement(logged.getUsername());
+        }
+    }
+
     public void sendCurrentText(){
+        if(disconnected) return;
+
         try {
             PrintWriter writer = new PrintWriter(connection.getOutputStream(), true);
             ChatMessage chat = new ChatMessage();
@@ -211,7 +225,12 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
             try {
                 reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
                 String response = reader.readLine();
-
+                if(response == null){
+                    addToChat("[ERROR: Disconnected!]");
+                    btnSend.setEnabled(false);
+                    connection.close();
+                    disconnected = true;
+                }
                 Packet packet = new Gson().fromJson(response, Packet.class);
 
                 if(packet.getId() == 01){
@@ -219,7 +238,8 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
                     System.out.println("Received Logged In packet! Parsing now...");
                     user = loggedIn.getUser();
                     addToChat("Logged in successfully! UUID: " + user.getUuid());
-                    addToChat(prettyGson.toJson(loggedIn));
+                    loggedInUsers = loggedIn.getLoggedInUsers();
+                    updateUsers();
 
                     user = loggedIn.getUser();
 
@@ -227,16 +247,30 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
                 if(packet.getId() == 02){
                     Packet02ChatMessage chatMessage = new Gson().fromJson(response, Packet02ChatMessage.class);
 
-                    if(chatMessage.getChat().isAction()){
-                        chatMessage.getChat().setMessage("<html><em>" + chatMessage.getChat().getMessage() + "</em></html>");
-                    }
-
-                    if(chatMessage.getChat().isServerMsg()){
-                        chatMessage.getChat().setMessage("<html><font color=\"purple\">" + chatMessage.getChat().getMessage() + "</font></html>");
-                    }
-
                     addToChat("[" + chatMessage.getChat().getUser().getUsername() + "] " + chatMessage.getChat().getMessage());
 
+                }
+
+                if(packet.getId() == 03){
+                    System.out.println(response);
+                    Packet03UserListChange change = new Gson().fromJson(response, Packet03UserListChange.class);
+                    if(change.getMessage().equalsIgnoreCase("remove")){
+                        for(int i = 0; i < loggedInUsers.size(); i++){
+                            if(loggedInUsers.get(i).getUsername().equals(change.getUser().getUsername())){
+                                loggedInUsers.remove(i);
+                                break;
+                            }
+                        }
+                        System.out.println("Removed " + change.getUser().getUsername());
+                    } else if(change.getMessage().equalsIgnoreCase("add")){
+                        loggedInUsers.add(change.getUser());
+                        System.out.println("Added " + change.getUser().getUsername());
+
+                    } else {
+                        System.out.println("Unrecognized packet received! " + packet.toJSON());
+                    }
+
+                    updateUsers();
                 }
 
             } catch (IOException e) {
