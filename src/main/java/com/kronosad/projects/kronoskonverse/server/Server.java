@@ -77,15 +77,17 @@ public class Server {
     }
 
     public void sendPacketToClients(Packet packet) throws IOException {
+        if(packet instanceof Packet02ChatMessage){
+            Packet02ChatMessage chatPacket = (Packet02ChatMessage) packet;
+            if(((Packet02ChatMessage) packet).getChat().getMessage().isEmpty()){ return; /** Null message, don't send. **/}
+            System.out.println("[" + chatPacket.getChat().getUser().getUsername() + "] " + chatPacket.getChat().getMessage());
+        }
         for(NetworkUser user : users){
             PrintWriter writer = new PrintWriter(user.getSocket().getOutputStream(), true);
             writer.println(packet.toJSON());
         }
 
-        if(packet instanceof Packet02ChatMessage){
-            Packet02ChatMessage chatPacket = (Packet02ChatMessage) packet;
-            System.out.println("[" + chatPacket.getChat().getUser().getUsername() + "] " + chatPacket.getChat().getMessage());
-        }
+
     }
 
     public void serve(){
