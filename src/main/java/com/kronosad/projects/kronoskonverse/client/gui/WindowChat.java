@@ -101,7 +101,6 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
 
     public void addToChat(String text){
         txtSentMessages.append(text + "\n");
-        txtMessage.setText("");
     }
 
 
@@ -202,11 +201,14 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
             Packet02ChatMessage packet = new Packet02ChatMessage(Packet.Initiator.CLIENT, chat);
 
             writer.println(packet.toJSON());
+
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         txtMessage.requestFocusInWindow();
+        txtMessage.setText("");
+
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
