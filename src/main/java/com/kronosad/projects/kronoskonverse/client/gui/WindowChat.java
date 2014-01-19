@@ -101,6 +101,7 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
 
     public void addToChat(String text){
         txtSentMessages.append(text + "\n");
+        txtSentMessages.setCaretPosition(txtSentMessages.getText().length());
     }
 
 
