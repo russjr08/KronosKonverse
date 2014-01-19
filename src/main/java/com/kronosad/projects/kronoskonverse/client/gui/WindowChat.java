@@ -250,6 +250,10 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
                 if(packet.getId() == 02){
                     Packet02ChatMessage chatMessage = new Gson().fromJson(response, Packet02ChatMessage.class);
 
+                    if(chatMessage.getChat().getMessage().contains(name)){
+                        NotificationHelper.mentioned(chatMessage);
+                    }
+
                     addToChat("[" + chatMessage.getChat().getUser().getUsername() + "] " + chatMessage.getChat().getMessage());
 
                 }
@@ -270,6 +274,7 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
                         // joining.
                         if(!change.getUser().getUsername().equals(user.getUsername())){
                             loggedInUsers.add(change.getUser());
+                            NotificationHelper.userLoggedIn(change);
                             System.out.println("Added " + change.getUser().getUsername());
                         }
 
