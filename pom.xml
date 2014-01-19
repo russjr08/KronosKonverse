@@ -23,7 +23,7 @@
                                 <configuration>
                                     <classifier>api</classifier>
                                     <includes>
-                                        <include>src/main/java/com/kronosad/projects/kronoskonverse/common</include>
+                                        <include>**/common/**</include>
                                     </includes>
 
                                 </configuration>
