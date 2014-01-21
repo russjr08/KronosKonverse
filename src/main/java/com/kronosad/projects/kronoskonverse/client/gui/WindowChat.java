@@ -83,6 +83,7 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
         listUsers.setModel(usersList);
         txtSentMessages.setLineWrap(true);
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        this.txtMessage.selectAll();
 
     }
 

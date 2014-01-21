@@ -89,7 +89,7 @@ public class Server {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-            } else if(response.startsWith("/kick")){
+            } else if(response.startsWith("kick")){
                 String username = response.split(" ")[1];
                 System.out.println("Kicking user: " + username);
                 StringBuilder kickBuilder = new StringBuilder();
