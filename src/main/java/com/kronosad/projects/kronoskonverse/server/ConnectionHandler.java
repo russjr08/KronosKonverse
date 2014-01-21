@@ -127,7 +127,7 @@ public class ConnectionHandler implements Runnable {
 
                             ChatMessage message = new ChatMessage();
                             message.setAction(true);
-                            message.setMessage(" is know known as " + newUser.getUsername());
+                            message.setMessage(" is now known as " + newUser.getUsername());
                             message.setUser(oldUser);
                             Packet02ChatMessage chatMessage = new Packet02ChatMessage(Packet.Initiator.SERVER, message);
                             server.sendPacketToClients(chatMessage);
