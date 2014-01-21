@@ -22,7 +22,6 @@ import java.util.Scanner;
  * Time: 5:30 PM
  */
 public class Server {
-    private int port;
 
     private ServerSocket server;
     private Version version = KronosKonverseAPI.API_VERSION;
@@ -52,7 +51,6 @@ public class Server {
             e.printStackTrace();
         }
 
-        this.port = port;
 
         System.out.println("Opening server on port: " + port);
 

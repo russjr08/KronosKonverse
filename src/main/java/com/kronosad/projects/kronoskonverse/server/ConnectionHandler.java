@@ -136,7 +136,7 @@ public class ConnectionHandler implements Runnable {
                             server.sendPacketToClients(listChange);
 
                             Packet01LoggedIn loggedIn = new Packet01LoggedIn(Packet.Initiator.SERVER, newUser, server.users);
-                            server.sendPacketToClient(oldUser, loggedIn);
+                            server.sendPacketToClient(newUser, loggedIn);
                             this.user = newUser;
                         }else{
                             server.sendPacketToClients(chat);

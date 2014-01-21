@@ -257,8 +257,6 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
                     loggedInUsers = loggedIn.getLoggedInUsers();
                     updateUsers();
 
-                    user = loggedIn.getUser();
-
                     this.setTitle("Topic: " + " Logged In As: " + user.getUsername());
 
 
