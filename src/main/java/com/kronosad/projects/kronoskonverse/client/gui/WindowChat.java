@@ -17,6 +17,8 @@ import com.kronosad.projects.kronoskonverse.common.user.NetworkUser;
 import javax.swing.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -84,6 +86,46 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
         txtSentMessages.setLineWrap(true);
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         this.txtMessage.selectAll();
+
+        this.addWindowListener(new WindowListener() {
+            @Override
+            public void windowOpened(WindowEvent windowEvent) {
+
+            }
+
+            @Override
+            public void windowClosing(WindowEvent windowEvent) {
+
+            }
+
+            @Override
+            public void windowClosed(WindowEvent windowEvent) {
+                if(!WindowChat.this.disconnected){
+                    System.exit(0);
+                }
+
+            }
+
+            @Override
+            public void windowIconified(WindowEvent windowEvent) {
+
+            }
+
+            @Override
+            public void windowDeiconified(WindowEvent windowEvent) {
+
+            }
+
+            @Override
+            public void windowActivated(WindowEvent windowEvent) {
+
+            }
+
+            @Override
+            public void windowDeactivated(WindowEvent windowEvent) {
+
+            }
+        });
 
     }
 
