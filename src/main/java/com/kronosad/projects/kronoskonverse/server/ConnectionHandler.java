@@ -2,9 +2,10 @@ package com.kronosad.projects.kronoskonverse.server;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.kronosad.projects.kronoskonverse.common.KronosKonverseAPI;
 import com.kronosad.projects.kronoskonverse.common.objects.ChatMessage;
 import com.kronosad.projects.kronoskonverse.common.packets.*;
-import com.kronosad.projects.kronoskonverse.server.implementation.NetworkUser;
+import com.kronosad.projects.kronoskonverse.common.user.NetworkUser;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -46,10 +47,10 @@ public class ConnectionHandler implements Runnable {
                 String response = inputStream.readLine();
                 Packet packet = new Gson().fromJson(response, Packet.class);
 
-                if(response == null){
+                if(response == null || response.equals("-1")){
                     System.out.println("Client disconnected: " + user.getUsername());
                     server.users.remove(user);
-                    Packet03UserListChange change = new Packet03UserListChange(Packet.Initiator.SERVER, user);
+                    Packet03UserListChange change = new Packet03UserListChange(Packet.Initiator.SERVER, server.users);
 
                     change.setMessage("remove");
                     server.sendPacketToClients(change);
@@ -73,10 +74,9 @@ public class ConnectionHandler implements Runnable {
 
                         if(handshake.getVersion().getProtocol().equalsIgnoreCase(server.getVersion().getProtocol())){
 
-                            user = new NetworkUser(client, handshake.getMessage().split("-")[1], UUID.randomUUID(), false);
+                            user = new NetworkUser(client, handshake.getMessage().split("-")[1].split(" ")[0], UUID.randomUUID().toString(), false);
 
-                            System.out.println("User connected!");
-                            System.out.println(prettyGson.toJson(user));
+                            System.out.println("User connected: " + user.getUsername());
                             server.users.add(user);
 
                             PrintWriter writer = new PrintWriter(client.getOutputStream(), true);
@@ -85,7 +85,7 @@ public class ConnectionHandler implements Runnable {
 
                             writer.println(loggedIn.toJSON());
 
-                            Packet03UserListChange change = new Packet03UserListChange(Packet.Initiator.SERVER, user);
+                            Packet03UserListChange change = new Packet03UserListChange(Packet.Initiator.SERVER, server.users);
 
                             change.setMessage("add");
 
@@ -102,7 +102,14 @@ public class ConnectionHandler implements Runnable {
 
 
                         }else{
+
                             System.err.println("Version mismatch! Disconnecting client!");
+                            Packet04Disconnect kickPacket = new Packet04Disconnect(Packet.Initiator.SERVER, user, true);
+                            kickPacket.setMessage("You're version is out of date! This server runs: " + KronosKonverseAPI.API_VERSION.getReadable() +
+                            " , please download the latest version from https://drone.io/github.com/russjr08/KronosKonverse/files");
+
+                            server.sendPacketToClient(user, kickPacket);
+
                             client.close();
                         }
                         break;
@@ -110,14 +117,48 @@ public class ConnectionHandler implements Runnable {
                         break;
                     case 2:
                         Packet02ChatMessage chat = new Gson().fromJson(response, Packet02ChatMessage.class);
+                        if(chat.getChat().getMessage().startsWith("/nick")){
+                            NetworkUser oldUser = server.getNetworkUserFromUser(chat.getChat().getUser());
 
-                        server.sendPacketToClients(chat);
+                            // TODO: Verify security here...
+                            NetworkUser newUser = new NetworkUser(this.client, chat.getChat().getMessage().split(" ")[1], oldUser.getUuid(), oldUser.isElevated());
+                            server.users.remove(oldUser);
+                            server.users.add(newUser);
+
+                            ChatMessage message = new ChatMessage();
+                            message.setAction(true);
+                            message.setMessage(" is know known as " + newUser.getUsername());
+                            message.setUser(oldUser);
+                            Packet02ChatMessage chatMessage = new Packet02ChatMessage(Packet.Initiator.SERVER, message);
+                            server.sendPacketToClients(chatMessage);
+
+                            Packet03UserListChange listChange = new Packet03UserListChange(Packet.Initiator.SERVER, server.users);
+                            server.sendPacketToClients(listChange);
+
+                            Packet01LoggedIn loggedIn = new Packet01LoggedIn(Packet.Initiator.SERVER, newUser, server.users);
+                            server.sendPacketToClient(oldUser, loggedIn);
+                            this.user = newUser;
+                        }else{
+                            server.sendPacketToClients(chat);
+                        }
                 }
 
             } catch (IOException e) {
                 e.printStackTrace();
-                System.out.println("Client disconnected: " + prettyGson.toJson(user));
+                System.out.println("Client disconnected with exception: " + prettyGson.toJson(user));
                 server.users.remove(user);
+
+                ChatMessage message = new ChatMessage();
+                message.setMessage(user.getUsername() + " has left.");
+                message.setUser(server.serverUser);
+
+                Packet02ChatMessage chatPacket = new Packet02ChatMessage(Packet.Initiator.SERVER, message);
+                try {
+                    server.sendPacketToClients(chatPacket);
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+                break;
             }
         }
 

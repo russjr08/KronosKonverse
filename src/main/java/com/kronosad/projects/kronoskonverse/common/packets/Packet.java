@@ -102,4 +102,12 @@ public class Packet implements INetworkable {
     public String toString() {
         return toJSON();
     }
+
+    public <T extends INetworkable> INetworkable getPayload() {
+        return payload;
+    }
+
+    public void setPayload(INetworkable payload) {
+        this.payload = payload;
+    }
 }

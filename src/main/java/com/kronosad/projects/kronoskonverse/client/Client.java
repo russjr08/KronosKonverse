@@ -8,7 +8,7 @@ import com.kronosad.projects.kronoskonverse.common.packets.Packet;
 import com.kronosad.projects.kronoskonverse.common.packets.Packet00Handshake;
 import com.kronosad.projects.kronoskonverse.common.packets.Packet01LoggedIn;
 import com.kronosad.projects.kronoskonverse.common.packets.Packet02ChatMessage;
-import com.kronosad.projects.kronoskonverse.server.implementation.NetworkUser;
+import com.kronosad.projects.kronoskonverse.common.user.NetworkUser;
 
 import java.io.BufferedReader;
 import java.io.IOException;

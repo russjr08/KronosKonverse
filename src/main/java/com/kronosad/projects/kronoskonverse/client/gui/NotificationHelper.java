@@ -15,13 +15,14 @@ import com.kronosad.projects.kronoskonverse.common.packets.Packet03UserListChang
 public class NotificationHelper {
     private static INotificationStyle style = new DarkDefaultNotification().withAlpha(0.9f).withWidth(400);
 
+    @Deprecated
     public static void userLoggedIn(Packet03UserListChange packet){
         new NotificationBuilder().withDisplayTime(10000).
                 withStyle(style)
                 .withPosition(Positions.NORTH_EAST)
                 .withTitle("KronosKonverse" +
                         " - User Logged In!")
-                .withMessage(String.format("%s has just logged in!", packet.getUser().getUsername()))
+//                .withMessage(String.format("%s has just logged in!", packet.getUser().getUsername()))
                 .showNotification();
     }
 

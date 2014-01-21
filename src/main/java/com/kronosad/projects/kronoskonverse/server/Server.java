@@ -1,11 +1,13 @@
 package com.kronosad.projects.kronoskonverse.server;
 
+import com.kronosad.projects.kronoskonverse.common.KronosKonverseAPI;
 import com.kronosad.projects.kronoskonverse.common.objects.ChatMessage;
 import com.kronosad.projects.kronoskonverse.common.objects.Version;
 import com.kronosad.projects.kronoskonverse.common.packets.Packet;
 import com.kronosad.projects.kronoskonverse.common.packets.Packet02ChatMessage;
+import com.kronosad.projects.kronoskonverse.common.packets.Packet04Disconnect;
+import com.kronosad.projects.kronoskonverse.common.user.NetworkUser;
 import com.kronosad.projects.kronoskonverse.common.user.User;
-import com.kronosad.projects.kronoskonverse.server.implementation.NetworkUser;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -23,7 +25,7 @@ public class Server {
     private int port;
 
     private ServerSocket server;
-    private Version version = new Version().setProtocol("1.0-ALPHA").setReadable("1.0 Alpha");
+    private Version version = KronosKonverseAPI.API_VERSION;
 
     protected User serverUser;
     protected ArrayList<NetworkUser> users = new ArrayList<NetworkUser>();
@@ -87,18 +89,55 @@ public class Server {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+            } else if(response.startsWith("/kick")){
+                String username = response.split(" ")[1];
+                System.out.println("Kicking user: " + username);
+                StringBuilder kickBuilder = new StringBuilder();
+                for(int i = 0; i < response.split(" ").length; i++){
+                    if(i != 0 && i != 1){
+                        kickBuilder.append(response.split(" ")[i] + " ");
+                    }
+                }
+
+                User user = new User();
+                try {
+                    Field usernameField = user.getClass().getDeclaredField("username");
+                    usernameField.setAccessible(true);
+                    usernameField.set(user, username);
+                    NetworkUser networkUser = getNetworkUserFromUser(user);
+                    if(networkUser == null){
+                        System.out.println("User was not found!");
+
+                    }else{
+                        Packet04Disconnect disconnect = new Packet04Disconnect(Packet.Initiator.SERVER, getNetworkUserFromUser(user), true);
+                        disconnect.setMessage(kickBuilder.toString());
+
+                        try {
+                            sendPacketToClient(getNetworkUserFromUser(user), disconnect);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                } catch (NoSuchFieldException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }else{
+                ChatMessage message = new ChatMessage();
+                message.setMessage(response);
+                message.setUser(serverUser);
+
+                Packet02ChatMessage packet02ChatMessage = new Packet02ChatMessage(Packet.Initiator.SERVER, message);
+                try {
+                    sendPacketToClients(packet02ChatMessage);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
 
-            ChatMessage message = new ChatMessage();
-            message.setMessage(response);
-            message.setUser(serverUser);
 
-            Packet02ChatMessage packet02ChatMessage = new Packet02ChatMessage(Packet.Initiator.SERVER, message);
-            try {
-                sendPacketToClients(packet02ChatMessage);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
     }
 
@@ -114,6 +153,30 @@ public class Server {
         }
 
 
+    }
+
+    public void sendPacketToClient(NetworkUser user, Packet packet) throws IOException {
+        if(packet instanceof Packet02ChatMessage){
+            Packet02ChatMessage chatPacket = (Packet02ChatMessage) packet;
+            if(((Packet02ChatMessage) packet).getChat().getMessage().isEmpty()){ return; /** Null message, don't send. **/}
+            System.out.println("[" + chatPacket.getChat().getUser().getUsername() + "] " + chatPacket.getChat().getMessage());
+        }
+
+        PrintWriter writer = new PrintWriter(user.getSocket().getOutputStream(), true);
+        writer.println(packet.toJSON());
+
+
+
+    }
+
+    public NetworkUser getNetworkUserFromUser(User user){
+        for(NetworkUser network : users){
+            if(network.getUsername().equalsIgnoreCase(user.getUsername())){
+                return network;
+            }
+        }
+
+        return null;
     }
 
     public void serve(){

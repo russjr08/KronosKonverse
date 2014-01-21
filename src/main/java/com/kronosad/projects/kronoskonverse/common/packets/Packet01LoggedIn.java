@@ -1,6 +1,6 @@
 package com.kronosad.projects.kronoskonverse.common.packets;
 
-import com.kronosad.projects.kronoskonverse.server.implementation.NetworkUser;
+import com.kronosad.projects.kronoskonverse.common.user.NetworkUser;
 
 import java.util.ArrayList;
 

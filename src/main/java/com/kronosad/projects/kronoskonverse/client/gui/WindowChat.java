@@ -8,10 +8,11 @@ package com.kronosad.projects.kronoskonverse.client.gui;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.kronosad.projects.kronoskonverse.common.KronosKonverseAPI;
 import com.kronosad.projects.kronoskonverse.common.objects.ChatMessage;
 import com.kronosad.projects.kronoskonverse.common.objects.Version;
 import com.kronosad.projects.kronoskonverse.common.packets.*;
-import com.kronosad.projects.kronoskonverse.server.implementation.NetworkUser;
+import com.kronosad.projects.kronoskonverse.common.user.NetworkUser;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
@@ -31,7 +32,7 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
     private Socket connection;
     private String name;
 
-    private static Version version = new Version().setProtocol("1.0-ALPHA").setReadable("1.0 Alpha");
+    private Version version = KronosKonverseAPI.API_VERSION;
 
     private DefaultListModel usersList = new DefaultListModel();
 
@@ -42,6 +43,8 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
     private Thread receive;
 
     boolean disconnected = false;
+    boolean firstLogin = true;
+
 
     private ArrayList<NetworkUser> loggedInUsers = new ArrayList<NetworkUser>();
 
@@ -79,6 +82,7 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
 
         listUsers.setModel(usersList);
         txtSentMessages.setLineWrap(true);
+        this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
     }
 
@@ -223,7 +227,7 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
 
     @Override
     public void run() {
-        while (true){
+        while (!disconnected){
             BufferedReader reader;
             try {
                 reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
@@ -233,6 +237,7 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
                     btnSend.setEnabled(false);
                     connection.close();
                     disconnected = true;
+                    break;
                 }
                 Packet packet = new Gson().fromJson(response, Packet.class);
 
@@ -240,11 +245,21 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
                     Packet01LoggedIn loggedIn = new Gson().fromJson(response, Packet01LoggedIn.class);
                     System.out.println("Received Logged In packet! Parsing now...");
                     user = loggedIn.getUser();
-                    addToChat("Logged in successfully! UUID: " + user.getUuid());
+
+                    if(firstLogin){
+                        addToChat("[Logged in successfully! UUID: " + user.getUuid() + "]");
+                        firstLogin = !firstLogin;
+                    }else{
+                        addToChat("[New Nickname applied!]");
+                    }
+
                     loggedInUsers = loggedIn.getLoggedInUsers();
                     updateUsers();
 
                     user = loggedIn.getUser();
+
+                    this.setTitle("Topic: " + " Logged In As: " + user.getUsername());
+
 
                 }
                 if(packet.getId() == 02){
@@ -254,43 +269,49 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
                         NotificationHelper.mentioned(chatMessage);
                     }
 
-                    addToChat("[" + chatMessage.getChat().getUser().getUsername() + "] " + chatMessage.getChat().getMessage());
+                    if(!chatMessage.getChat().isAction())
+                        addToChat("[" + chatMessage.getChat().getUser().getUsername() + "] " + chatMessage.getChat().getMessage());
+                    else
+                        addToChat("* " + chatMessage.getChat().getUser().getUsername() + chatMessage.getChat().getMessage());
+
 
                 }
 
                 if(packet.getId() == 03){
                     System.out.println(response);
                     Packet03UserListChange change = new Gson().fromJson(response, Packet03UserListChange.class);
-                    if(change.getMessage().equalsIgnoreCase("remove")){
-                        for(int i = 0; i < loggedInUsers.size(); i++){
-                            if(loggedInUsers.get(i).getUsername().equals(change.getUser().getUsername())){
-                                loggedInUsers.remove(i);
-                                break;
-                            }
-                        }
-                        System.out.println("Removed " + change.getUser().getUsername());
-                    } else if(change.getMessage().equalsIgnoreCase("add")){
-                        // The server will send everyone a Packet03UserListChange, we want to ignore it if it is from us
-                        // joining.
-                        if(!change.getUser().getUsername().equals(user.getUsername())){
-                            loggedInUsers.add(change.getUser());
-                            NotificationHelper.userLoggedIn(change);
-                            System.out.println("Added " + change.getUser().getUsername());
-                        }
+
+                    loggedInUsers = change.getOnlineUsers();
 
 
-                    } else {
-                        System.out.println("Unrecognized packet received! " + packet.toJSON());
-                    }
 
                     updateUsers();
+                }
+
+                if(packet.getId() == 04){
+                    System.out.println(response);
+                    Packet04Disconnect disconnect = new Gson().fromJson(response, Packet04Disconnect.class);
+
+                    if(disconnect.isKick()){
+                        System.out.println("Kicked from Server!");
+                        addToChat("[Error: You were kicked from the server: " + disconnect.getMessage());
+                        connection.close();
+                        disconnected = true;
+                    }else{
+                        System.out.println("Disconnect Packet Received!");
+                        addToChat("[Error: You were disconnected from the server: " + disconnect.getMessage());
+                    }
+                    disconnected = true;
+
                 }
 
             } catch (IOException e) {
                 e.printStackTrace();
                 addToChat("Connection error!");
                 addToChat(e.getMessage());
+                disconnected = true;
             }
         }
+        new LoginWindow().setVisible(true);
     }
 }

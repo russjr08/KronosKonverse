@@ -1,10 +1,8 @@
-package com.kronosad.projects.kronoskonverse.server.implementation;
+package com.kronosad.projects.kronoskonverse.common.user;
 
 import com.google.gson.Gson;
-import com.kronosad.projects.kronoskonverse.common.user.User;
 
 import java.net.Socket;
-import java.util.UUID;
 
 /**
  * User: russjr08
@@ -13,12 +11,12 @@ import java.util.UUID;
  */
 public class NetworkUser extends User{
 
-    private transient Socket socket;
+    public transient Socket socket;
 
-    public NetworkUser(Socket socket, String name,  UUID uuid, boolean elevated){
+    public NetworkUser(Socket socket, String name, String uuid, boolean elevated){
         this.socket = socket;
         this.username = name;
-        this.uuid = uuid.toString();
+        this.uuid = uuid;
         this.elevated = elevated;
     }
 
