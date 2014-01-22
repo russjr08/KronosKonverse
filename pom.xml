@@ -74,7 +74,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>LATEST</version>
                 <configuration>
                     <excludePackageNames>ch.*</excludePackageNames>
                 </configuration>
