@@ -11,6 +11,6 @@ public interface INetworkHandler {
      * This method is called whenever a {@link com.kronosad.projects.kronoskonverse.common.packets.Packet} is received from the server.
      * @param packet The {@link com.kronosad.projects.kronoskonverse.common.packets.Packet} received from the Server.
      */
-    public void onPacketReceived(Packet packet);
+    public void onPacketReceived(Packet packet, String response);
 
 }

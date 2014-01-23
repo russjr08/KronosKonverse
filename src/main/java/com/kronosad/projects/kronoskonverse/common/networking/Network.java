@@ -56,7 +56,7 @@ public class Network {
                         Packet packet = new Gson().fromJson(response, Packet.class);
                         if(packet != null){
                             for(INetworkHandler handler : handlers){
-                                handler.onPacketReceived(packet);
+                                handler.onPacketReceived(packet, response);
                             }
                         }
 
