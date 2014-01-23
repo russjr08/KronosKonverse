@@ -313,7 +313,7 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
                     if(!chatMessage.getChat().isAction())
                         addToChat("[" + chatMessage.getChat().getUser().getUsername() + "] " + chatMessage.getChat().getMessage());
                     else
-                        addToChat("* " + chatMessage.getChat().getUser().getUsername() + chatMessage.getChat().getMessage());
+                        addToChat("* " + chatMessage.getChat().getUser().getUsername() + " " + chatMessage.getChat().getMessage());
 
 
                 }
