@@ -32,14 +32,17 @@ public class Network {
      * @param address Address of server to connect to.
      * @param port Port of server to connect to.
      * @param handshake The {@link com.kronosad.projects.kronoskonverse.common.packets.Packet00Handshake} to be sent to the server when the connection is opened.
-     * @param networkHandler The inital {@link com.kronosad.projects.kronoskonverse.common.interfaces.INetworkHandler} to use for handling packets.
      * @throws IOException Thrown in case there was a problem with the Network.
      */
-    public Network(String address, int port, Packet00Handshake handshake, INetworkHandler networkHandler) throws IOException {
+    public Network(String address, int port, Packet00Handshake handshake) throws IOException {
         connection = new Socket(address, port);
         connected = true;
-        handlers.add(networkHandler);
         sendPacket(handshake);
+
+
+    }
+
+    public void connect(){
         receive = new Thread("Receive Thread - KronosKonverse Network API"){
             @Override
             public void run() {
@@ -67,7 +70,6 @@ public class Network {
             }
         };
         receive.start();
-
     }
 
     /**
