@@ -73,8 +73,18 @@ public class ConnectionHandler implements Runnable {
                         System.out.println(handshake.getVersion().toJSON());
 
                         if(handshake.getVersion().getProtocol().equalsIgnoreCase(server.getVersion().getProtocol())){
+                            String username = handshake.getMessage().split("-")[1].split(" ")[0];
 
                             user = new NetworkUser(client, handshake.getMessage().split("-")[1].split(" ")[0], UUID.randomUUID().toString(), false);
+
+                            for(NetworkUser networkUser : server.users){
+                                if(networkUser.getUsername().equalsIgnoreCase(username) || username.equalsIgnoreCase("server")){
+                                    Packet04Disconnect disconnect = new Packet04Disconnect(Packet.Initiator.SERVER, user, true);
+                                    disconnect.setMessage("Someone is already logged into the server with that name!");
+                                    server.sendPacketToClient(user, disconnect);
+
+                                }
+                            }
 
                             System.out.println("User connected: " + user.getUsername());
                             server.users.add(user);

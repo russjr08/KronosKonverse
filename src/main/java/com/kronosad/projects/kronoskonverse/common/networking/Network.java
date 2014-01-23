@@ -94,7 +94,8 @@ public class Network {
      */
     public void sendPacket(Packet packet) throws IOException {
         if(!connected){ throw new IllegalAccessError("Network connection is already closed!"); }
-        PrintWriter writer = new PrintWriter(connection.getOutputStream());
+        PrintWriter writer = new PrintWriter(connection.getOutputStream(), true);
+        System.out.println("TEST POINT #1: " + packet.toJSON());
         writer.println(packet.toJSON());
     }
 
