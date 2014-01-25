@@ -2,6 +2,7 @@ package com.kronosad.projects.kronoskonverse.server;
 
 import com.kronosad.projects.kronoskonverse.common.KronosKonverseAPI;
 import com.kronosad.projects.kronoskonverse.common.objects.ChatMessage;
+import com.kronosad.projects.kronoskonverse.common.objects.PrivateMessage;
 import com.kronosad.projects.kronoskonverse.common.objects.Version;
 import com.kronosad.projects.kronoskonverse.common.packets.Packet;
 import com.kronosad.projects.kronoskonverse.common.packets.Packet02ChatMessage;
@@ -142,8 +143,22 @@ public class Server {
     public void sendPacketToClients(Packet packet) throws IOException {
         if(packet instanceof Packet02ChatMessage){
             Packet02ChatMessage chatPacket = (Packet02ChatMessage) packet;
-            if(((Packet02ChatMessage) packet).getChat().getMessage().isEmpty()){ return; /** Null message, don't send. **/}
-            System.out.println("[" + chatPacket.getChat().getUser().getUsername() + "] " + chatPacket.getChat().getMessage());
+            if(((Packet02ChatMessage) packet).getChat().getMessage().isEmpty() || ((Packet02ChatMessage) packet).getChat().getMessage().trim().isEmpty()){ return; /** Null message, don't send. **/}
+            if(chatPacket.isPrivate()){
+                PrivateMessage msg = chatPacket.getPrivateMessage();
+                for(NetworkUser user : users){
+                    if(user.getUsername().equals(msg.getRecipient().getUsername()) || user.getUsername().equals(chatPacket.getChat().getUser().getUsername())){
+                        sendPacketToClient(user, packet);
+                        System.out.println(String.format("[%s -> %s] %s", chatPacket.getChat().getUser().getUsername(), msg.getRecipient().getUsername(), chatPacket.getChat().getMessage()));
+                        return;
+                    }
+                }
+
+            }else{
+                System.out.println("[" + chatPacket.getChat().getUser().getUsername() + "] " + chatPacket.getChat().getMessage());
+
+            }
+
         }
         for(NetworkUser user : users){
             PrintWriter writer = new PrintWriter(user.getSocket().getOutputStream(), true);

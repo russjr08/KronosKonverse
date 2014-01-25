@@ -10,9 +10,11 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.kronosad.projects.kronoskonverse.common.KronosKonverseAPI;
 import com.kronosad.projects.kronoskonverse.common.objects.ChatMessage;
+import com.kronosad.projects.kronoskonverse.common.objects.PrivateMessage;
 import com.kronosad.projects.kronoskonverse.common.objects.Version;
 import com.kronosad.projects.kronoskonverse.common.packets.*;
 import com.kronosad.projects.kronoskonverse.common.user.NetworkUser;
+import com.kronosad.projects.kronoskonverse.common.user.User;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
@@ -23,6 +25,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.lang.reflect.Field;
 import java.net.Socket;
 import java.util.ArrayList;
 
@@ -238,17 +241,49 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
 
         try {
             PrintWriter writer = new PrintWriter(connection.getOutputStream(), true);
-            ChatMessage chat = new ChatMessage();
-            chat.setUser(user);
-            chat.setMessage(txtMessage.getText());
-            if(chat.getMessage().startsWith("/me")){
-                chat.setMessage(chat.getMessage().replace("/me", ""));
-                chat.setAction(true);
+            if(txtMessage.getText().startsWith("/tell")){
+                PrivateMessage chat = new PrivateMessage();
+                String[] pieces = txtMessage.getText().split(" ");
+                if(pieces.length >= 3){
+                    String username = pieces[1];
+                    User recipient = new User();
+
+                    try {
+                        Field userField = recipient.getClass().getDeclaredField("username");
+                        userField.setAccessible(true);
+                        userField.set(recipient, username);
+                    } catch (NoSuchFieldException e) {
+                        e.printStackTrace();
+                        return;
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                        return;
+                    }
+                    chat.setRecipient(recipient);
+
+                    String message = txtMessage.getText().replace("/tell", "").replace(username, "");
+                    chat.setMessage(message);
+
+
+                }
+                chat.setUser(this.user);
+                chat.setMessage(txtMessage.getText().split(" ")[2]);
+
+                Packet02ChatMessage packet = new Packet02ChatMessage(Packet.Initiator.CLIENT, chat);
+                packet.setPrivate(true);
+                writer.println(packet.toJSON());
+            }else{
+                ChatMessage chat = new ChatMessage();
+                chat.setUser(user);
+                chat.setMessage(txtMessage.getText());
+                if(chat.getMessage().startsWith("/me")){
+                    chat.setMessage(chat.getMessage().replace("/me", ""));
+                    chat.setAction(true);
+                }
+                Packet02ChatMessage packet = new Packet02ChatMessage(Packet.Initiator.CLIENT, chat);
+
+                writer.println(packet.toJSON());
             }
-
-            Packet02ChatMessage packet = new Packet02ChatMessage(Packet.Initiator.CLIENT, chat);
-
-            writer.println(packet.toJSON());
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -306,15 +341,20 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
                 if(packet.getId() == 02){
                     Packet02ChatMessage chatMessage = new Gson().fromJson(response, Packet02ChatMessage.class);
 
-                    if(chatMessage.getChat().getMessage().contains(name)){
+
+                    if(chatMessage.getChat().getMessage().contains(name) || chatMessage.isPrivate()){
                         NotificationHelper.mentioned(chatMessage);
                     }
 
-                    if(!chatMessage.getChat().isAction())
-                        addToChat("[" + chatMessage.getChat().getUser().getUsername() + "] " + chatMessage.getChat().getMessage());
-                    else
-                        addToChat("* " + chatMessage.getChat().getUser().getUsername() + " " + chatMessage.getChat().getMessage());
-
+                    if(chatMessage.isPrivate()){
+                        PrivateMessage privateMsg = chatMessage.getPrivateMessage();
+                        addToChat(String.format("[%s -> %s] %s", privateMsg.getUser().getUsername(), privateMsg.getRecipient().getUsername(), privateMsg.getMessage()));
+                    }else{
+                        if(!chatMessage.getChat().isAction())
+                            addToChat("[" + chatMessage.getChat().getUser().getUsername() + "] " + chatMessage.getChat().getMessage());
+                        else
+                            addToChat("* " + chatMessage.getChat().getUser().getUsername() + " " + chatMessage.getChat().getMessage());
+                    }
 
                 }
 
