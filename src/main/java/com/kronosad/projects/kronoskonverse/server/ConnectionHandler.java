@@ -72,10 +72,11 @@ public class ConnectionHandler implements Runnable {
                         System.out.println(prettyGson.toJson(handshake));
                         System.out.println(handshake.getVersion().toJSON());
 
+                        user = new NetworkUser(client, handshake.getMessage().split("-")[1].split(" ")[0], UUID.randomUUID().toString(), false);
+
                         if(handshake.getVersion().getProtocol().equalsIgnoreCase(server.getVersion().getProtocol())){
                             String username = handshake.getMessage().split("-")[1].split(" ")[0];
 
-                            user = new NetworkUser(client, handshake.getMessage().split("-")[1].split(" ")[0], UUID.randomUUID().toString(), false);
 
                             for(NetworkUser networkUser : server.users){
                                 if(networkUser.getUsername().equalsIgnoreCase(username) || username.equalsIgnoreCase("server")){
@@ -114,13 +115,16 @@ public class ConnectionHandler implements Runnable {
                         }else{
 
                             System.err.println("Version mismatch! Disconnecting client!");
+                            server.users.add(user);
                             Packet04Disconnect kickPacket = new Packet04Disconnect(Packet.Initiator.SERVER, user, true);
-                            kickPacket.setMessage("You're version is out of date! This server runs: " + KronosKonverseAPI.API_VERSION.getReadable() +
+                            kickPacket.setMessage("Your version is out of date! This server runs: " + KronosKonverseAPI.API_VERSION.getReadable() +
                             " , please download the latest version from https://drone.io/github.com/russjr08/KronosKonverse/files");
 
                             server.sendPacketToClient(user, kickPacket);
 
                             client.close();
+                            server.users.remove(user);
+                            manage.stop();
                         }
                         break;
                     case 1:
