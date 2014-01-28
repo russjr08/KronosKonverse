@@ -11,12 +11,14 @@ import com.google.gson.GsonBuilder;
 import com.kronosad.projects.kronoskonverse.common.KronosKonverseAPI;
 import com.kronosad.projects.kronoskonverse.common.objects.ChatMessage;
 import com.kronosad.projects.kronoskonverse.common.objects.PrivateMessage;
+import com.kronosad.projects.kronoskonverse.common.objects.Room;
 import com.kronosad.projects.kronoskonverse.common.objects.Version;
 import com.kronosad.projects.kronoskonverse.common.packets.*;
 import com.kronosad.projects.kronoskonverse.common.user.NetworkUser;
 import com.kronosad.projects.kronoskonverse.common.user.User;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowEvent;
@@ -47,11 +49,13 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
 
     private Thread receive;
 
+    private Room currentRoom;
+
     boolean disconnected = false;
     boolean firstLogin = true;
 
 
-    private ArrayList<NetworkUser> loggedInUsers = new ArrayList<NetworkUser>();
+    private ArrayList<User> loggedInUsers = new ArrayList<User>();
 
     /**
      * Creates new form WindowChat
@@ -142,6 +146,15 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
     public void addToChat(String text){
         txtSentMessagesMain.append(text + "\n");
         txtSentMessagesMain.setCaretPosition(txtSentMessagesMain.getText().length());
+    }
+
+    public Component getTab(String tabName){
+        for(int i = 0; i < roomsTabbedPane.getTabCount(); i++){
+            if(roomsTabbedPane.getTitleAt(i).equals(tabName)){
+                return roomsTabbedPane.getComponentAt(i);
+            }
+        }
+        return null;
     }
 
     public void addTextToTab(String tabName, String text){
@@ -253,7 +266,7 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
     public void updateUsers(){
         usersList.clear();
         usersList.removeAllElements();
-        for(NetworkUser logged : loggedInUsers){
+        for(User logged : loggedInUsers){
             usersList.addElement(logged.getUsername());
         }
     }
@@ -290,6 +303,7 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
                 }
                 chat.setUser(this.user);
                 chat.setMessage(txtMessage.getText().split(" ")[2]);
+                chat.setRoom(currentRoom);
 
                 Packet02ChatMessage packet = new Packet02ChatMessage(Packet.Initiator.CLIENT, chat);
                 packet.setPrivate(true);
@@ -298,6 +312,7 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
                 ChatMessage chat = new ChatMessage();
                 chat.setUser(user);
                 chat.setMessage(txtMessage.getText());
+                chat.setRoom(currentRoom);
                 if(chat.getMessage().startsWith("/me")){
                     chat.setMessage(chat.getMessage().replace("/me", ""));
                     chat.setAction(true);
@@ -351,11 +366,14 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
                     if(firstLogin){
                         addToChat("[Logged in successfully! UUID: " + user.getUuid() + "]");
                         firstLogin = !firstLogin;
-                    }else{
-                        addToChat("[New Nickname applied!]");
                     }
 
-                    loggedInUsers = loggedIn.getLoggedInUsers();
+                    currentRoom = loggedIn.getRoom();
+                    loggedInUsers = currentRoom.getUsers();
+                    if(!currentRoom.getName().equals("Main")){
+                        this.roomsTabbedPane.addTab(currentRoom.getName(), fabricateNewTextArea());
+                        this.roomsTabbedPane.setSelectedComponent(getTab(currentRoom.getName()));
+                    }
                     updateUsers();
 
                     this.setTitle("Topic: " + " Logged In As: " + user.getUsername());
@@ -374,10 +392,24 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
                         PrivateMessage privateMsg = chatMessage.getPrivateMessage();
                         addToChat(String.format("[%s -> %s] %s", privateMsg.getUser().getUsername(), privateMsg.getRecipient().getUsername(), privateMsg.getMessage()));
                     }else{
-                        if(!chatMessage.getChat().isAction())
-                            addToChat("[" + chatMessage.getChat().getUser().getUsername() + "] " + chatMessage.getChat().getMessage());
-                        else
-                            addToChat("* " + chatMessage.getChat().getUser().getUsername() + " " + chatMessage.getChat().getMessage());
+                        if(chatMessage.getChat().getRoom() != null){
+                            if(chatMessage.getChat().getRoom().getName().equals("Main")){
+                                if(!chatMessage.getChat().isAction())
+                                    addToChat("[" + chatMessage.getChat().getUser().getUsername() + "] " + chatMessage.getChat().getMessage());
+                                else
+                                    addToChat("* " + chatMessage.getChat().getUser().getUsername() + " " + chatMessage.getChat().getMessage());
+                            }else{
+                                if(!chatMessage.getChat().isAction())
+                                    addTextToTab(chatMessage.getChat().getRoom().getName(), "[" + chatMessage.getChat().getUser().getUsername() + "] " + chatMessage.getChat().getMessage());
+                                else
+                                    addTextToTab(chatMessage.getChat().getRoom().getName(), "* " + chatMessage.getChat().getUser().getUsername() + " " + chatMessage.getChat().getMessage());
+                            }
+                        }else{
+                            if(!chatMessage.getChat().isAction())
+                                addToChat("[" + chatMessage.getChat().getUser().getUsername() + "] " + chatMessage.getChat().getMessage());
+                            else
+                                addToChat("* " + chatMessage.getChat().getUser().getUsername() + " " + chatMessage.getChat().getMessage());
+                        }
                     }
 
                 }
