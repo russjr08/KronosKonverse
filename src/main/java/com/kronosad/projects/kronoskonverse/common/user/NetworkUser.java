@@ -1,6 +1,7 @@
 package com.kronosad.projects.kronoskonverse.common.user;
 
 import com.google.gson.Gson;
+import com.kronosad.projects.kronoskonverse.common.objects.Room;
 
 import java.net.Socket;
 
@@ -12,6 +13,7 @@ import java.net.Socket;
 public class NetworkUser extends User{
 
     public transient Socket socket;
+    public transient Room room;
 
     public NetworkUser(Socket socket, String name, String uuid, boolean elevated){
         this.socket = socket;

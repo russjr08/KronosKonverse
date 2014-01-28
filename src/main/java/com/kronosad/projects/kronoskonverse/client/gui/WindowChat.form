@@ -25,9 +25,9 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                  <Component id="txtMessage" pref="482" max="32767" attributes="0"/>
-                  <Component id="jScrollPane1" max="32767" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="txtMessage" min="-2" pref="482" max="-2" attributes="0"/>
+                  <Component id="roomsTabbedPane" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
@@ -43,8 +43,8 @@
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" max="-2" attributes="0">
-                  <Component id="jScrollPane2" pref="357" max="32767" attributes="0"/>
-                  <Component id="jScrollPane1" max="32767" attributes="0"/>
+                  <Component id="jScrollPane2" max="32767" attributes="0"/>
+                  <Component id="roomsTabbedPane" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="32767" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
@@ -89,20 +89,52 @@
         </Property>
       </Properties>
     </Component>
-    <Container class="javax.swing.JScrollPane" name="jScrollPane1">
+    <Container class="javax.swing.JTabbedPane" name="roomsTabbedPane">
       <AuxValues>
-        <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
+        <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="4"/>
       </AuxValues>
 
-      <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
+      <Layout class="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout"/>
       <SubComponents>
-        <Component class="javax.swing.JTextArea" name="txtSentMessages">
-          <Properties>
-            <Property name="editable" type="boolean" value="false"/>
-            <Property name="columns" type="int" value="20"/>
-            <Property name="rows" type="int" value="5"/>
-          </Properties>
-        </Component>
+        <Container class="javax.swing.JPanel" name="jPanel1">
+          <Constraints>
+            <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout" value="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout$JTabbedPaneConstraintsDescription">
+              <JTabbedPaneConstraints tabName="Main">
+                <Property name="tabTitle" type="java.lang.String" value="Main"/>
+              </JTabbedPaneConstraints>
+            </Constraint>
+          </Constraints>
+
+          <Layout>
+            <DimensionLayout dim="0">
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="jScrollPane1" alignment="0" pref="461" max="32767" attributes="0"/>
+              </Group>
+            </DimensionLayout>
+            <DimensionLayout dim="1">
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="jScrollPane1" alignment="0" pref="311" max="32767" attributes="0"/>
+              </Group>
+            </DimensionLayout>
+          </Layout>
+          <SubComponents>
+            <Container class="javax.swing.JScrollPane" name="jScrollPane1">
+              <AuxValues>
+                <AuxValue name="autoScrollPane" type="java.lang.Boolean" value="true"/>
+              </AuxValues>
+
+              <Layout class="org.netbeans.modules.form.compat2.layouts.support.JScrollPaneSupportLayout"/>
+              <SubComponents>
+                <Component class="javax.swing.JTextArea" name="txtSentMessagesMain">
+                  <Properties>
+                    <Property name="columns" type="int" value="20"/>
+                    <Property name="rows" type="int" value="5"/>
+                  </Properties>
+                </Component>
+              </SubComponents>
+            </Container>
+          </SubComponents>
+        </Container>
       </SubComponents>
     </Container>
   </SubComponents>

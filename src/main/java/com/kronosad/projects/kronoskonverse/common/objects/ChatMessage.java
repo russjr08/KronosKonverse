@@ -13,6 +13,23 @@ public class ChatMessage implements INetworkable {
     private boolean serverMsg, action = false;
     private String message;
     private User user;
+    private Room room;
+
+    /**
+     * The room associated with this chat message.
+     * @return The room this chat message is associated with.
+     */
+    public Room getRoom() {
+        return room;
+    }
+
+    /**
+     * Sets the room that this message is associated with.
+     * @param room The Room this message is assocated with.
+     */
+    public void setRoom(Room room) {
+        this.room = room;
+    }
 
     public boolean isServerMsg() {
         return serverMsg;

@@ -11,12 +11,14 @@ import com.google.gson.GsonBuilder;
 import com.kronosad.projects.kronoskonverse.common.KronosKonverseAPI;
 import com.kronosad.projects.kronoskonverse.common.objects.ChatMessage;
 import com.kronosad.projects.kronoskonverse.common.objects.PrivateMessage;
+import com.kronosad.projects.kronoskonverse.common.objects.Room;
 import com.kronosad.projects.kronoskonverse.common.objects.Version;
 import com.kronosad.projects.kronoskonverse.common.packets.*;
 import com.kronosad.projects.kronoskonverse.common.user.NetworkUser;
 import com.kronosad.projects.kronoskonverse.common.user.User;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowEvent;
@@ -47,11 +49,13 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
 
     private Thread receive;
 
+    private Room currentRoom;
+
     boolean disconnected = false;
     boolean firstLogin = true;
 
 
-    private ArrayList<NetworkUser> loggedInUsers = new ArrayList<NetworkUser>();
+    private ArrayList<User> loggedInUsers = new ArrayList<User>();
 
     /**
      * Creates new form WindowChat
@@ -86,9 +90,11 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
         });
 
         listUsers.setModel(usersList);
-        txtSentMessages.setLineWrap(true);
+        txtSentMessagesMain.setLineWrap(true);
+        txtSentMessagesMain.setEditable(false);
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         this.txtMessage.selectAll();
+
 
         this.addWindowListener(new WindowListener() {
             @Override
@@ -138,11 +144,38 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
     }
 
     public void addToChat(String text){
-        txtSentMessages.append(text + "\n");
-        txtSentMessages.setCaretPosition(txtSentMessages.getText().length());
+        txtSentMessagesMain.append(text + "\n");
+        txtSentMessagesMain.setCaretPosition(txtSentMessagesMain.getText().length());
     }
 
+    public Component getTab(String tabName){
+        for(int i = 0; i < roomsTabbedPane.getTabCount(); i++){
+            if(roomsTabbedPane.getTitleAt(i).equals(tabName)){
+                return roomsTabbedPane.getComponentAt(i);
+            }
+        }
+        return null;
+    }
 
+    public void addTextToTab(String tabName, String text){
+        for(int i = 0; i < roomsTabbedPane.getTabCount(); i++){
+            if(roomsTabbedPane.getTitleAt(i).equals(tabName)){
+                if(roomsTabbedPane.getComponentAt(i) instanceof JTextArea){
+                    JTextArea textArea = (JTextArea) roomsTabbedPane.getComponentAt(i);
+                    textArea.append(text + "\n");
+                    textArea.setCaretPosition(textArea.getText().length());
+                }
+            }
+        }
+    }
+    public JTextArea fabricateNewTextArea(){
+        JTextArea area = new JTextArea();
+        area.setEditable(false);
+        area.setLineWrap(true);
+        area.setCaretPosition(0);
+
+        return area;
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -157,8 +190,10 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
         listUsers = new javax.swing.JList();
         btnSend = new javax.swing.JButton();
         txtMessage = new javax.swing.JTextField();
+        roomsTabbedPane = new javax.swing.JTabbedPane();
+        jPanel1 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        txtSentMessages = new javax.swing.JTextArea();
+        txtSentMessagesMain = new javax.swing.JTextArea();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -174,10 +209,22 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
         txtMessage.setText("Type your thoughts here!");
         txtMessage.setCursor(new java.awt.Cursor(java.awt.Cursor.TEXT_CURSOR));
 
-        txtSentMessages.setEditable(false);
-        txtSentMessages.setColumns(20);
-        txtSentMessages.setRows(5);
-        jScrollPane1.setViewportView(txtSentMessages);
+        txtSentMessagesMain.setColumns(20);
+        txtSentMessagesMain.setRows(5);
+        jScrollPane1.setViewportView(txtSentMessagesMain);
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 461, Short.MAX_VALUE)
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 311, Short.MAX_VALUE)
+        );
+
+        roomsTabbedPane.addTab("Main", jPanel1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -185,9 +232,9 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(txtMessage, javax.swing.GroupLayout.DEFAULT_SIZE, 482, Short.MAX_VALUE)
-                    .addComponent(jScrollPane1))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txtMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 482, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(roomsTabbedPane))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
@@ -199,8 +246,8 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 357, Short.MAX_VALUE)
-                    .addComponent(jScrollPane1))
+                    .addComponent(jScrollPane2)
+                    .addComponent(roomsTabbedPane))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtMessage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -219,7 +266,7 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
     public void updateUsers(){
         usersList.clear();
         usersList.removeAllElements();
-        for(NetworkUser logged : loggedInUsers){
+        for(User logged : loggedInUsers){
             usersList.addElement(logged.getUsername());
         }
     }
@@ -256,6 +303,7 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
                 }
                 chat.setUser(this.user);
                 chat.setMessage(txtMessage.getText().split(" ")[2]);
+                chat.setRoom(currentRoom);
 
                 Packet02ChatMessage packet = new Packet02ChatMessage(Packet.Initiator.CLIENT, chat);
                 packet.setPrivate(true);
@@ -264,6 +312,7 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
                 ChatMessage chat = new ChatMessage();
                 chat.setUser(user);
                 chat.setMessage(txtMessage.getText());
+                chat.setRoom(currentRoom);
                 if(chat.getMessage().startsWith("/me")){
                     chat.setMessage(chat.getMessage().replace("/me", ""));
                     chat.setAction(true);
@@ -284,11 +333,13 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSend;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JList listUsers;
+    protected javax.swing.JTabbedPane roomsTabbedPane;
     private javax.swing.JTextField txtMessage;
-    private javax.swing.JTextArea txtSentMessages;
+    private javax.swing.JTextArea txtSentMessagesMain;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -315,11 +366,14 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
                     if(firstLogin){
                         addToChat("[Logged in successfully! UUID: " + user.getUuid() + "]");
                         firstLogin = !firstLogin;
-                    }else{
-                        addToChat("[New Nickname applied!]");
                     }
 
-                    loggedInUsers = loggedIn.getLoggedInUsers();
+                    currentRoom = loggedIn.getRoom();
+                    loggedInUsers = currentRoom.getUsers();
+                    if(!currentRoom.getName().equals("Main")){
+                        this.roomsTabbedPane.addTab(currentRoom.getName(), fabricateNewTextArea());
+                        this.roomsTabbedPane.setSelectedComponent(getTab(currentRoom.getName()));
+                    }
                     updateUsers();
 
                     this.setTitle("Topic: " + " Logged In As: " + user.getUsername());
@@ -338,10 +392,24 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
                         PrivateMessage privateMsg = chatMessage.getPrivateMessage();
                         addToChat(String.format("[%s -> %s] %s", privateMsg.getUser().getUsername(), privateMsg.getRecipient().getUsername(), privateMsg.getMessage()));
                     }else{
-                        if(!chatMessage.getChat().isAction())
-                            addToChat("[" + chatMessage.getChat().getUser().getUsername() + "] " + chatMessage.getChat().getMessage());
-                        else
-                            addToChat("* " + chatMessage.getChat().getUser().getUsername() + " " + chatMessage.getChat().getMessage());
+                        if(chatMessage.getChat().getRoom() != null){
+                            if(chatMessage.getChat().getRoom().getName().equals("Main")){
+                                if(!chatMessage.getChat().isAction())
+                                    addToChat("[" + chatMessage.getChat().getUser().getUsername() + "] " + chatMessage.getChat().getMessage());
+                                else
+                                    addToChat("* " + chatMessage.getChat().getUser().getUsername() + " " + chatMessage.getChat().getMessage());
+                            }else{
+                                if(!chatMessage.getChat().isAction())
+                                    addTextToTab(chatMessage.getChat().getRoom().getName(), "[" + chatMessage.getChat().getUser().getUsername() + "] " + chatMessage.getChat().getMessage());
+                                else
+                                    addTextToTab(chatMessage.getChat().getRoom().getName(), "* " + chatMessage.getChat().getUser().getUsername() + " " + chatMessage.getChat().getMessage());
+                            }
+                        }else{
+                            if(!chatMessage.getChat().isAction())
+                                addToChat("[" + chatMessage.getChat().getUser().getUsername() + "] " + chatMessage.getChat().getMessage());
+                            else
+                                addToChat("* " + chatMessage.getChat().getUser().getUsername() + " " + chatMessage.getChat().getMessage());
+                        }
                     }
 
                 }
