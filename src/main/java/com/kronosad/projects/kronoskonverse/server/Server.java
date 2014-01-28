@@ -3,10 +3,8 @@ package com.kronosad.projects.kronoskonverse.server;
 import com.kronosad.projects.kronoskonverse.common.KronosKonverseAPI;
 import com.kronosad.projects.kronoskonverse.common.objects.ChatMessage;
 import com.kronosad.projects.kronoskonverse.common.objects.PrivateMessage;
-import com.kronosad.projects.kronoskonverse.common.objects.Room;
 import com.kronosad.projects.kronoskonverse.common.objects.Version;
 import com.kronosad.projects.kronoskonverse.common.packets.Packet;
-import com.kronosad.projects.kronoskonverse.common.packets.Packet01LoggedIn;
 import com.kronosad.projects.kronoskonverse.common.packets.Packet02ChatMessage;
 import com.kronosad.projects.kronoskonverse.common.packets.Packet04Disconnect;
 import com.kronosad.projects.kronoskonverse.common.user.NetworkUser;
@@ -31,13 +29,14 @@ public class Server {
 
     protected User serverUser;
     protected ArrayList<NetworkUser> users = new ArrayList<NetworkUser>();
-    protected ArrayList<Room> rooms = new ArrayList<Room>();
+
     protected boolean running = false;
 
 
 
     public Server(int port){
         serverUser = new User();
+
         try {
             Field username = serverUser.getClass().getDeclaredField("username");
             Field uuid = serverUser.getClass().getDeclaredField("uuid");
@@ -52,9 +51,6 @@ public class Server {
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
-
-        rooms.add(new Room("Main", serverUser));
-        System.out.println("Default room created!");
 
 
         System.out.println("Opening server on port: " + port);
@@ -162,15 +158,6 @@ public class Server {
                 System.out.println("[" + chatPacket.getChat().getUser().getUsername() + "] " + chatPacket.getChat().getMessage());
 
             }
-            if(chatPacket.getChat().getRoom() != null){
-                Room serverRoom = getRoom(chatPacket.getChat().getRoom().getName());
-                for(User user : serverRoom.getUsers()){
-                    NetworkUser networkUser = getNetworkUserFromUser(user);
-                    PrintWriter writer = new PrintWriter(networkUser.socket.getOutputStream(), true);
-                    writer.println(packet.toJSON());
-                    return;
-                }
-            }
 
         }
         for(NetworkUser user : users){
@@ -227,75 +214,6 @@ public class Server {
 
     public static void main(String[] args){
         new Server(Integer.valueOf(args[0]));
-    }
-
-    public ArrayList<User> getLoggedInUsers(){
-        ArrayList<User> loggedInUsers = new ArrayList<User>();
-        for(NetworkUser user : users){
-            loggedInUsers.add(user);
-        }
-        return loggedInUsers;
-    }
-
-    public void addUser(NetworkUser user){
-        addUser(user, true);
-    }
-
-    public void addUser(NetworkUser user, boolean newUser){
-        users.add(user);
-        if(newUser){
-            setUsersRoom(user.getUsername(), getRoom("Main"));
-        }
-    }
-
-    public void removeUser(NetworkUser user){
-        getRoom(user.room.getName()).removeUser(user.getUsername());
-        users.remove(user);
-    }
-
-    public Room getRoom(String name){
-        for(Room room : rooms){
-            if(room.getName().equals(name)){
-                return room;
-            }
-        }
-
-        return null;
-    }
-
-    public void addRoom(Room room){
-        rooms.add(room);
-    }
-
-    public void removeRoom(String roomName){
-        for(Room room : rooms){
-            if(room.getName().equals(roomName)){
-                rooms.remove(room);
-                break;
-            }
-        }
-    }
-
-    public void setUsersRoom(String user, Room room){
-        for(NetworkUser userList : users){
-            if(userList.getUsername().equals(user)){
-                room.addUser(userList);
-                if(userList.room != null){
-                    getRoom(userList.room.getName()).removeUser(userList.getUsername());
-                }
-                userList.room = room;
-                if(getRoom(room.getName()) == null){
-                    addRoom(room);
-                }
-                Packet01LoggedIn loggedIn = new Packet01LoggedIn(Packet.Initiator.SERVER, userList, getLoggedInUsers());
-                try {
-                    sendPacketToClient(userList, loggedIn);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                break;
-            }
-        }
     }
 
 }

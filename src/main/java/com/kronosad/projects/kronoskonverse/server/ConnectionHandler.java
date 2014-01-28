@@ -4,17 +4,14 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.kronosad.projects.kronoskonverse.common.KronosKonverseAPI;
 import com.kronosad.projects.kronoskonverse.common.objects.ChatMessage;
-import com.kronosad.projects.kronoskonverse.common.objects.Room;
 import com.kronosad.projects.kronoskonverse.common.packets.*;
 import com.kronosad.projects.kronoskonverse.common.user.NetworkUser;
-import com.kronosad.projects.kronoskonverse.common.user.User;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.UUID;
 
 /**
@@ -52,13 +49,8 @@ public class ConnectionHandler implements Runnable {
 
                 if(response == null || response.equals("-1")){
                     System.out.println("Client disconnected: " + user.getUsername());
-                    server.removeUser(user);
-
-                    ArrayList<User> loggedInUsers = new ArrayList<User>();
-                    for(NetworkUser user : server.users){
-                        loggedInUsers.add(user);
-                    }
-                    Packet03UserListChange change = new Packet03UserListChange(Packet.Initiator.SERVER, loggedInUsers);
+                    server.users.remove(user);
+                    Packet03UserListChange change = new Packet03UserListChange(Packet.Initiator.SERVER, server.users);
 
                     change.setMessage("remove");
                     server.sendPacketToClients(change);
@@ -66,7 +58,6 @@ public class ConnectionHandler implements Runnable {
 
                     ChatMessage message = new ChatMessage();
                     message.setMessage(user.getUsername() + " has left.");
-                    message.setServerMsg(true);
                     message.setUser(server.serverUser);
 
                     Packet02ChatMessage chatPacket = new Packet02ChatMessage(Packet.Initiator.SERVER, message);
@@ -97,20 +88,15 @@ public class ConnectionHandler implements Runnable {
                             }
 
                             System.out.println("User connected: " + user.getUsername());
-                            server.addUser(user);
+                            server.users.add(user);
 
                             PrintWriter writer = new PrintWriter(client.getOutputStream(), true);
 
-                            ArrayList<User> loggedInUsers = new ArrayList<User>();
-                            for(NetworkUser user : server.users){
-                                loggedInUsers.add(user);
-                            }
-
-                            Packet01LoggedIn loggedIn = new Packet01LoggedIn(Packet.Initiator.SERVER, user, loggedInUsers);
+                            Packet01LoggedIn loggedIn = new Packet01LoggedIn(Packet.Initiator.SERVER, user, server.users);
 
                             writer.println(loggedIn.toJSON());
 
-                            Packet03UserListChange change = new Packet03UserListChange(Packet.Initiator.SERVER, loggedInUsers);
+                            Packet03UserListChange change = new Packet03UserListChange(Packet.Initiator.SERVER, server.users);
 
                             change.setMessage("add");
 
@@ -118,7 +104,6 @@ public class ConnectionHandler implements Runnable {
 
                             ChatMessage message = new ChatMessage();
                             message.setMessage(user.getUsername() + " has joined!");
-                            message.setServerMsg(true);
                             message.setUser(server.serverUser);
 
                             Packet02ChatMessage chatPacket = new Packet02ChatMessage(Packet.Initiator.SERVER, message);
@@ -130,15 +115,15 @@ public class ConnectionHandler implements Runnable {
                         }else{
 
                             System.err.println("Version mismatch! Disconnecting client!");
-                            server.addUser(user);
+                            server.users.add(user);
                             Packet04Disconnect kickPacket = new Packet04Disconnect(Packet.Initiator.SERVER, user, true);
                             kickPacket.setMessage("Your version is out of date! This server runs: " + KronosKonverseAPI.API_VERSION.getReadable() +
-                                    " , please download the latest version from https://drone.io/github.com/russjr08/KronosKonverse/files");
+                            " , please download the latest version from https://drone.io/github.com/russjr08/KronosKonverse/files");
 
                             server.sendPacketToClient(user, kickPacket);
 
                             client.close();
-                            server.removeUser(user);
+                            server.users.remove(user);
                             manage.stop();
                         }
                         break;
@@ -151,39 +136,22 @@ public class ConnectionHandler implements Runnable {
 
                             // TODO: Verify security here...
                             NetworkUser newUser = new NetworkUser(this.client, chat.getChat().getMessage().split(" ")[1], oldUser.getUuid(), oldUser.isElevated());
-                            server.removeUser(oldUser);
-                            server.addUser(newUser, false);
+                            server.users.remove(oldUser);
+                            server.users.add(newUser);
 
                             ChatMessage message = new ChatMessage();
                             message.setAction(true);
                             message.setMessage(" is now known as " + newUser.getUsername());
-                            message.setServerMsg(true);
                             message.setUser(oldUser);
                             Packet02ChatMessage chatMessage = new Packet02ChatMessage(Packet.Initiator.SERVER, message);
                             server.sendPacketToClients(chatMessage);
 
-                            ArrayList<User> loggedInUsers = new ArrayList<User>();
-                            for(NetworkUser user : server.users){
-                                loggedInUsers.add(user);
-                            }
-
-                            Packet03UserListChange listChange = new Packet03UserListChange(Packet.Initiator.SERVER, loggedInUsers);
+                            Packet03UserListChange listChange = new Packet03UserListChange(Packet.Initiator.SERVER, server.users);
                             server.sendPacketToClients(listChange);
 
-                            Packet01LoggedIn loggedIn = new Packet01LoggedIn(Packet.Initiator.SERVER, newUser, loggedInUsers);
+                            Packet01LoggedIn loggedIn = new Packet01LoggedIn(Packet.Initiator.SERVER, newUser, server.users);
                             server.sendPacketToClient(newUser, loggedIn);
                             this.user = newUser;
-                        }else if(chat.getChat().getMessage().startsWith("/room")){
-                            Room room = server.getRoom(chat.getChat().getMessage().split(" ")[1]);
-                            if(room == null){
-                                room = new Room(chat.getChat().getMessage().split(" ")[1], user);
-                                this.user.room = room;
-                                server.setUsersRoom(user.getUsername(), room);
-                            }else{
-                                server.setUsersRoom(user.getUsername(), server.getRoom(chat.getChat().getMessage().split(" ")[1]));
-                                this.user.room = server.getRoom(chat.getChat().getMessage().split(" ")[1]);
-                            }
-
                         }else{
                             server.sendPacketToClients(chat);
                         }
@@ -192,11 +160,10 @@ public class ConnectionHandler implements Runnable {
             } catch (IOException e) {
                 e.printStackTrace();
                 System.out.println("Client disconnected with exception: " + prettyGson.toJson(user));
-                server.removeUser(user);
+                server.users.remove(user);
 
                 ChatMessage message = new ChatMessage();
                 message.setMessage(user.getUsername() + " has left.");
-                message.setServerMsg(true);
                 message.setUser(server.serverUser);
 
                 Packet02ChatMessage chatPacket = new Packet02ChatMessage(Packet.Initiator.SERVER, message);

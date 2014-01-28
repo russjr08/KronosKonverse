@@ -1,8 +1,6 @@
 package com.kronosad.projects.kronoskonverse.common.packets;
 
-import com.kronosad.projects.kronoskonverse.common.objects.Room;
 import com.kronosad.projects.kronoskonverse.common.user.NetworkUser;
-import com.kronosad.projects.kronoskonverse.common.user.User;
 
 import java.util.ArrayList;
 
@@ -13,14 +11,13 @@ import java.util.ArrayList;
  */
 public class Packet01LoggedIn extends Packet {
     private NetworkUser user;
-    private ArrayList<User> loggedInUsers;
-    private Room room;
+    private ArrayList<NetworkUser> loggedInUsers;
     /**
      * All Packets should be constructed with an {@link com.kronosad.projects.kronoskonverse.common.packets.Packet.Initiator} as the parameter.
      *
      * @param initiator Initiator of said Packet.
      */
-    public Packet01LoggedIn(Initiator initiator, NetworkUser user, ArrayList<User> loggedInUsers) {
+    public Packet01LoggedIn(Initiator initiator, NetworkUser user, ArrayList<NetworkUser> loggedInUsers) {
         super(initiator, 01);
         if(!assertInitiator(initiator, Initiator.SERVER)){
 
@@ -28,7 +25,7 @@ public class Packet01LoggedIn extends Packet {
 
         }
         this.loggedInUsers = loggedInUsers;
-        this.room = user.room;
+
         this.user = user;
 
     }
@@ -37,11 +34,7 @@ public class Packet01LoggedIn extends Packet {
         return user;
     }
 
-    public Room getRoom() {
-        return room;
-    }
-
-    public ArrayList<User> getLoggedInUsers() {
+    public ArrayList<NetworkUser> getLoggedInUsers() {
         return loggedInUsers;
     }
 

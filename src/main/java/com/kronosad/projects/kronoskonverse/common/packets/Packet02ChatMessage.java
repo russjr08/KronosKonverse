@@ -13,7 +13,6 @@ public class Packet02ChatMessage extends Packet {
     private ChatMessage chat;
     private PrivateMessage privateMessage;
     private boolean isPrivate;
-
     /**
      * All Packets should be constructed with an {@link com.kronosad.projects.kronoskonverse.common.packets.Packet.Initiator} as the parameter.
      *
@@ -24,7 +23,6 @@ public class Packet02ChatMessage extends Packet {
         this.chat = chat;
         if(chat instanceof PrivateMessage){
             this.privateMessage = (PrivateMessage)chat;
-            this.setPrivate(true);
         }
 
     }

@@ -8,6 +8,6 @@ import com.kronosad.projects.kronoskonverse.common.objects.Version;
  * Time: 6:36 PM
  */
 public class KronosKonverseAPI {
-    public static final Version API_VERSION = new Version().setProtocol("1.3-ALPHA").setReadable("1.3 Alpha");
+    public static final Version API_VERSION = new Version().setProtocol("1.2-ALPHA").setReadable("1.2 Alpha");
 
 }
