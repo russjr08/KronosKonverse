@@ -86,9 +86,10 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
         });
 
         listUsers.setModel(usersList);
-        txtSentMessages.setLineWrap(true);
+        txtSentMessagesMain.setLineWrap(true);
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         this.txtMessage.selectAll();
+
 
         this.addWindowListener(new WindowListener() {
             @Override
@@ -138,11 +139,29 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
     }
 
     public void addToChat(String text){
-        txtSentMessages.append(text + "\n");
-        txtSentMessages.setCaretPosition(txtSentMessages.getText().length());
+        txtSentMessagesMain.append(text + "\n");
+        txtSentMessagesMain.setCaretPosition(txtSentMessagesMain.getText().length());
     }
 
+    public void addTextToTab(String tabName, String text){
+        for(int i = 0; i < roomsTabbedPane.getTabCount(); i++){
+            if(roomsTabbedPane.getTitleAt(i).equals(tabName)){
+                if(roomsTabbedPane.getComponentAt(i) instanceof JTextArea){
+                    JTextArea textArea = (JTextArea) roomsTabbedPane.getComponentAt(i);
+                    textArea.append(text + "\n");
+                    textArea.setCaretPosition(textArea.getText().length());
+                }
+            }
+        }
+    }
+    public JTextArea fabricateNewTextArea(){
+        JTextArea area = new JTextArea();
+        area.setEditable(false);
+        area.setLineWrap(true);
+        area.setCaretPosition(0);
 
+        return area;
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -157,8 +176,10 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
         listUsers = new javax.swing.JList();
         btnSend = new javax.swing.JButton();
         txtMessage = new javax.swing.JTextField();
+        roomsTabbedPane = new javax.swing.JTabbedPane();
+        jPanel1 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        txtSentMessages = new javax.swing.JTextArea();
+        txtSentMessagesMain = new javax.swing.JTextArea();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -174,10 +195,22 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
         txtMessage.setText("Type your thoughts here!");
         txtMessage.setCursor(new java.awt.Cursor(java.awt.Cursor.TEXT_CURSOR));
 
-        txtSentMessages.setEditable(false);
-        txtSentMessages.setColumns(20);
-        txtSentMessages.setRows(5);
-        jScrollPane1.setViewportView(txtSentMessages);
+        txtSentMessagesMain.setColumns(20);
+        txtSentMessagesMain.setRows(5);
+        jScrollPane1.setViewportView(txtSentMessagesMain);
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 461, Short.MAX_VALUE)
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 311, Short.MAX_VALUE)
+        );
+
+        roomsTabbedPane.addTab("Main", jPanel1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -185,9 +218,9 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(txtMessage, javax.swing.GroupLayout.DEFAULT_SIZE, 482, Short.MAX_VALUE)
-                    .addComponent(jScrollPane1))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txtMessage, javax.swing.GroupLayout.PREFERRED_SIZE, 482, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(roomsTabbedPane))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
@@ -199,8 +232,8 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 357, Short.MAX_VALUE)
-                    .addComponent(jScrollPane1))
+                    .addComponent(jScrollPane2)
+                    .addComponent(roomsTabbedPane))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(txtMessage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -284,11 +317,13 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSend;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JList listUsers;
+    protected javax.swing.JTabbedPane roomsTabbedPane;
     private javax.swing.JTextField txtMessage;
-    private javax.swing.JTextArea txtSentMessages;
+    private javax.swing.JTextArea txtSentMessagesMain;
     // End of variables declaration//GEN-END:variables
 
     @Override
