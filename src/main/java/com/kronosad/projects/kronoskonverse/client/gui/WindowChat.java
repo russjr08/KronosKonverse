@@ -92,14 +92,10 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
 
         this.addWindowListener(new WindowListener() {
             @Override
-            public void windowOpened(WindowEvent windowEvent) {
-
-            }
+            public void windowOpened(WindowEvent windowEvent) {}
 
             @Override
-            public void windowClosing(WindowEvent windowEvent) {
-
-            }
+            public void windowClosing(WindowEvent windowEvent) {}
 
             @Override
             public void windowClosed(WindowEvent windowEvent) {
@@ -110,24 +106,16 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
             }
 
             @Override
-            public void windowIconified(WindowEvent windowEvent) {
-
-            }
+            public void windowIconified(WindowEvent windowEvent) {}
 
             @Override
-            public void windowDeiconified(WindowEvent windowEvent) {
-
-            }
+            public void windowDeiconified(WindowEvent windowEvent) {}
 
             @Override
-            public void windowActivated(WindowEvent windowEvent) {
-
-            }
+            public void windowActivated(WindowEvent windowEvent) {}
 
             @Override
-            public void windowDeactivated(WindowEvent windowEvent) {
-
-            }
+            public void windowDeactivated(WindowEvent windowEvent) {}
         });
 
     }
