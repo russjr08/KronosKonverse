@@ -1,6 +1,7 @@
 package com.kronosad.projects.kronoskonverse.common.packets;
 
-import com.kronosad.projects.kronoskonverse.common.user.NetworkUser;
+import com.kronosad.projects.kronoskonverse.common.user.User;
+import com.kronosad.projects.kronoskonverse.server.NetworkUser;
 
 /**
  * User: russjr08
@@ -12,7 +13,7 @@ import com.kronosad.projects.kronoskonverse.common.user.NetworkUser;
  * A packet for saying that a client disconnected or should be disconnected (Kick).
  */
 public class Packet04Disconnect extends Packet {
-    private NetworkUser disconnected;
+    private User disconnected;
     private boolean isKick;
 
     /**
@@ -28,7 +29,7 @@ public class Packet04Disconnect extends Packet {
 
     }
 
-    public NetworkUser getDisconnected() {
+    public User getDisconnected() {
         return disconnected;
     }
 

@@ -5,7 +5,6 @@ import com.google.gson.GsonBuilder;
 import com.kronosad.projects.kronoskonverse.common.KronosKonverseAPI;
 import com.kronosad.projects.kronoskonverse.common.objects.ChatMessage;
 import com.kronosad.projects.kronoskonverse.common.packets.*;
-import com.kronosad.projects.kronoskonverse.common.user.NetworkUser;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -74,16 +73,18 @@ public class ConnectionHandler implements Runnable {
 
                         user = new NetworkUser(client, handshake.getMessage().split("-")[1].split(" ")[0], UUID.randomUUID().toString(), false);
 
+                        if(handshake.getVersion() == null){
+                            System.out.println("Client " + user.getUsername() + " doesn't have a version set! Disconnecting...");
+                            user.disconnect("Your handshake did not contain a version!", true);
+                        }
+
                         if(handshake.getVersion().getProtocol().equalsIgnoreCase(server.getVersion().getProtocol())){
                             String username = handshake.getMessage().split("-")[1].split(" ")[0];
 
 
                             for(NetworkUser networkUser : server.users){
                                 if(networkUser.getUsername().equalsIgnoreCase(username) || username.equalsIgnoreCase("server")){
-                                    Packet04Disconnect disconnect = new Packet04Disconnect(Packet.Initiator.SERVER, user, true);
-                                    disconnect.setMessage("Someone is already logged into the server with that name!");
-                                    server.sendPacketToClient(user, disconnect);
-
+                                    user.disconnect("Someone is already logged into the server with that name!", true);
                                 }
                             }
 
@@ -116,14 +117,13 @@ public class ConnectionHandler implements Runnable {
 
                             System.err.println("Version mismatch! Disconnecting client!");
                             server.users.add(user);
-                            Packet04Disconnect kickPacket = new Packet04Disconnect(Packet.Initiator.SERVER, user, true);
-                            kickPacket.setMessage("Your version is out of date! This server runs: " + KronosKonverseAPI.API_VERSION.getReadable() +
-                            " , please download the latest version from https://drone.io/github.com/russjr08/KronosKonverse/files");
+                            user.disconnect("Your version is out of date! You are running " + handshake.getVersion().getReadable() + " This server runs: " + KronosKonverseAPI.API_VERSION.getReadable() +
+                                    " , please download the latest version from https://drone.io/github.com/russjr08/KronosKonverse/files", true);
 
-                            server.sendPacketToClient(user, kickPacket);
+                            if(!client.isClosed()){
+                                client.close();
 
-                            client.close();
-                            server.users.remove(user);
+                            }
                             manage.stop();
                         }
                         break;
@@ -160,18 +160,7 @@ public class ConnectionHandler implements Runnable {
             } catch (IOException e) {
                 e.printStackTrace();
                 System.out.println("Client disconnected with exception: " + prettyGson.toJson(user));
-                server.users.remove(user);
-
-                ChatMessage message = new ChatMessage();
-                message.setMessage(user.getUsername() + " has left.");
-                message.setUser(server.serverUser);
-
-                Packet02ChatMessage chatPacket = new Packet02ChatMessage(Packet.Initiator.SERVER, message);
-                try {
-                    server.sendPacketToClients(chatPacket);
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
+                user.disconnect("Disconnected via Exception", false);
                 break;
             }
         }

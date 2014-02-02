@@ -8,7 +8,7 @@ import com.kronosad.projects.kronoskonverse.common.packets.Packet;
 import com.kronosad.projects.kronoskonverse.common.packets.Packet00Handshake;
 import com.kronosad.projects.kronoskonverse.common.packets.Packet01LoggedIn;
 import com.kronosad.projects.kronoskonverse.common.packets.Packet02ChatMessage;
-import com.kronosad.projects.kronoskonverse.common.user.NetworkUser;
+import com.kronosad.projects.kronoskonverse.common.user.User;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -29,7 +29,7 @@ public class Client implements Runnable {
 
     private static Thread receive;
 
-    private NetworkUser user;
+    private User user;
 
     private Gson prettyGson = new GsonBuilder().setPrettyPrinting().create();
 

@@ -13,7 +13,7 @@ import com.kronosad.projects.kronoskonverse.common.objects.ChatMessage;
 import com.kronosad.projects.kronoskonverse.common.objects.PrivateMessage;
 import com.kronosad.projects.kronoskonverse.common.objects.Version;
 import com.kronosad.projects.kronoskonverse.common.packets.*;
-import com.kronosad.projects.kronoskonverse.common.user.NetworkUser;
+import com.kronosad.projects.kronoskonverse.server.NetworkUser;
 import com.kronosad.projects.kronoskonverse.common.user.User;
 
 import javax.swing.*;
@@ -43,7 +43,7 @@ public class WindowChat extends javax.swing.JFrame implements Runnable{
 
     private Gson prettyGson = new GsonBuilder().setPrettyPrinting().create();
 
-    private NetworkUser user;
+    private User user;
 
     private Thread receive;
 

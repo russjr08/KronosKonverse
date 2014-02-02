@@ -1,6 +1,7 @@
 package com.kronosad.projects.kronoskonverse.common.packets;
 
-import com.kronosad.projects.kronoskonverse.common.user.NetworkUser;
+import com.kronosad.projects.kronoskonverse.common.user.User;
+import com.kronosad.projects.kronoskonverse.server.NetworkUser;
 
 import java.util.ArrayList;
 
@@ -10,7 +11,7 @@ import java.util.ArrayList;
  * Time: 7:08 PM
  */
 public class Packet01LoggedIn extends Packet {
-    private NetworkUser user;
+    private User user;
     private ArrayList<NetworkUser> loggedInUsers;
     /**
      * All Packets should be constructed with an {@link com.kronosad.projects.kronoskonverse.common.packets.Packet.Initiator} as the parameter.
@@ -30,7 +31,7 @@ public class Packet01LoggedIn extends Packet {
 
     }
 
-    public NetworkUser getUser() {
+    public User getUser() {
         return user;
     }
 

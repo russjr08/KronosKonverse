@@ -6,8 +6,6 @@ import com.kronosad.projects.kronoskonverse.common.objects.PrivateMessage;
 import com.kronosad.projects.kronoskonverse.common.objects.Version;
 import com.kronosad.projects.kronoskonverse.common.packets.Packet;
 import com.kronosad.projects.kronoskonverse.common.packets.Packet02ChatMessage;
-import com.kronosad.projects.kronoskonverse.common.packets.Packet04Disconnect;
-import com.kronosad.projects.kronoskonverse.common.user.NetworkUser;
 import com.kronosad.projects.kronoskonverse.common.user.User;
 
 import java.io.IOException;
@@ -32,7 +30,7 @@ public class Server {
 
     protected boolean running = false;
 
-
+    protected static Server instance;
 
     public Server(int port){
         serverUser = new User();
@@ -64,6 +62,9 @@ public class Server {
             e.printStackTrace();
             System.err.println("There was a problem binding to port: " + port);
         }
+
+        instance = this;
+
 
         while(running){
             Scanner in = new Scanner(System.in);
@@ -108,14 +109,8 @@ public class Server {
                         System.out.println("User was not found!");
 
                     }else{
-                        Packet04Disconnect disconnect = new Packet04Disconnect(Packet.Initiator.SERVER, getNetworkUserFromUser(user), true);
-                        disconnect.setMessage(kickBuilder.toString());
+                        networkUser.disconnect(kickBuilder.toString(), true);
 
-                        try {
-                            sendPacketToClient(getNetworkUserFromUser(user), disconnect);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
                     }
 
                 } catch (NoSuchFieldException e) {
@@ -136,8 +131,8 @@ public class Server {
                 }
             }
 
-
         }
+
     }
 
     public void sendPacketToClients(Packet packet) throws IOException {
@@ -214,6 +209,10 @@ public class Server {
 
     public static void main(String[] args){
         new Server(Integer.valueOf(args[0]));
+    }
+
+    public static Server getInstance(){
+        return instance;
     }
 
 }
