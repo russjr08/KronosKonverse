@@ -18,12 +18,14 @@
 
                             <execution>
                                 <id>api</id>
-                                <goals><goal>jar</goal></goals>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
                                 <phase>package</phase>
                                 <configuration>
                                     <classifier>api</classifier>
                                     <includes>
-                                        <include>**/common/**</include>
+                                        <include>**/com.kronosad.konverse.common/**</include>
                                     </includes>
 
                                 </configuration>
