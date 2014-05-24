@@ -40,8 +40,6 @@ public class Network {
         connection = new Socket(address, port);
         connected = true;
         sendPacket(handshake);
-
-
     }
 
     public void connect() {

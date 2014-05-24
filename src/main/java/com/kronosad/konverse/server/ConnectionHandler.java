@@ -5,15 +5,12 @@ import com.google.gson.GsonBuilder;
 import com.kronosad.konverse.common.KronosKonverseAPI;
 import com.kronosad.konverse.common.objects.ChatMessage;
 import com.kronosad.konverse.common.packets.*;
-import com.kronosad.konverse.common.user.User;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -52,18 +49,9 @@ public class ConnectionHandler implements Runnable {
                 if (response == null || response.equals("-1")) {
                     System.out.println("Client disconnected: " + user.getUsername());
                     server.users.remove(user);
-                    Packet03UserListChange change = new Packet03UserListChange(Packet.Initiator.SERVER, server.users);
-
-                    change.setMessage("remove");
-                    server.sendPacketToClients(change);
+                    server.broadcastUserChange(user, false);
                     client.close();
 
-                    ChatMessage message = new ChatMessage();
-                    message.setMessage(user.getUsername() + " has left.");
-                    message.setUser(server.serverUser);
-
-                    Packet02ChatMessage chatPacket = new Packet02ChatMessage(Packet.Initiator.SERVER, message);
-                    server.sendPacketToClients(chatPacket);
                     break;
                 }
                 switch (packet.getId()) {
@@ -86,8 +74,11 @@ public class ConnectionHandler implements Runnable {
 
 
                             for (NetworkUser networkUser : server.users) {
-                                if (networkUser.getUsername().equalsIgnoreCase(username) || username.equalsIgnoreCase("com/kronosad/konverse/server")) {
-                                    user.disconnect("Someone is already logged into the com.kronosad.konverse.server with that name!", true);
+                                if (networkUser.getUsername().equalsIgnoreCase(username) || username.equalsIgnoreCase("server")) {
+                                    Packet05ConnectionStatus connectionStatus = new Packet05ConnectionStatus(Packet.Initiator.SERVER, Packet05ConnectionStatus.NICK_IN_USE);
+                                    server.sendPacketToClient(user, connectionStatus);
+                                    user.disconnect("Someone is already logged into the server with that name!", true);
+
                                 }
                             }
 
@@ -95,28 +86,13 @@ public class ConnectionHandler implements Runnable {
                             server.users.add(user);
 
                             PrintWriter writer = new PrintWriter(client.getOutputStream(), true);
-                            List<User> userList = new ArrayList<User>();
-                            for (User user : server.users) {
-                                userList.add(user);
-                            }
 
-                            Packet01LoggedIn loggedIn = new Packet01LoggedIn(Packet.Initiator.SERVER, user, userList);
+                            Packet01LoggedIn loggedIn = new Packet01LoggedIn(Packet.Initiator.SERVER, user, server.getOnlineUsers());
 
                             writer.println(loggedIn.toJSON());
 
-                            Packet03UserListChange change = new Packet03UserListChange(Packet.Initiator.SERVER, server.users);
+                            server.broadcastUserChange(user, true);
 
-                            change.setMessage("add");
-
-                            server.sendPacketToClients(change);
-
-                            ChatMessage message = new ChatMessage();
-                            message.setMessage(user.getUsername() + " has joined!");
-                            message.setUser(server.serverUser);
-
-                            Packet02ChatMessage chatPacket = new Packet02ChatMessage(Packet.Initiator.SERVER, message);
-
-                            server.sendPacketToClients(chatPacket);
 
 
                         } else {
@@ -152,15 +128,9 @@ public class ConnectionHandler implements Runnable {
                             Packet02ChatMessage chatMessage = new Packet02ChatMessage(Packet.Initiator.SERVER, message);
                             server.sendPacketToClients(chatMessage);
 
-                            Packet03UserListChange listChange = new Packet03UserListChange(Packet.Initiator.SERVER, server.users);
-                            server.sendPacketToClients(listChange);
+                            server.sendUserChange();
 
-                            List<User> userList = new ArrayList<User>();
-                            for (User user : server.users) {
-                                userList.add(user);
-                            }
-
-                            Packet01LoggedIn loggedIn = new Packet01LoggedIn(Packet.Initiator.SERVER, newUser, userList);
+                            Packet01LoggedIn loggedIn = new Packet01LoggedIn(Packet.Initiator.SERVER, newUser, server.getOnlineUsers());
                             server.sendPacketToClient(newUser, loggedIn);
                             this.user = newUser;
                         } else {

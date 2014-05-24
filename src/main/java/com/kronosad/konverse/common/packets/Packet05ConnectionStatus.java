@@ -22,10 +22,9 @@ public class Packet05ConnectionStatus extends Packet {
      * All Packets should be constructed with an {@link com.kronosad.konverse.common.packets.Packet.Initiator} as the parameter.
      *
      * @param initiator Initiator of said Packet.
-     * @param id
      */
-    public Packet05ConnectionStatus(Initiator initiator, int id, int status) {
-        super(initiator, id);
+    public Packet05ConnectionStatus(Initiator initiator, int status) {
+        super(initiator, 5);
         this.status = status;
 
         if (!assertInitiator(initiator, Initiator.SERVER)) {

@@ -6,6 +6,7 @@ package com.kronosad.konverse.client.interfaces;
  */
 
 import com.kronosad.konverse.common.objects.ChatMessage;
+import com.kronosad.konverse.common.objects.PrivateMessage;
 
 /**
  * A class that implements {@link com.kronosad.konverse.client.interfaces.IMessageReceptor} is able to receive and handle
@@ -14,5 +15,6 @@ import com.kronosad.konverse.common.objects.ChatMessage;
 public interface IMessageReceptor {
 
     public void handleMessage(ChatMessage message);
+    public void handlePrivateMessage(PrivateMessage message);
 
 }

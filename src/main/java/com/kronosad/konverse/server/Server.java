@@ -6,6 +6,7 @@ import com.kronosad.konverse.common.objects.PrivateMessage;
 import com.kronosad.konverse.common.objects.Version;
 import com.kronosad.konverse.common.packets.Packet;
 import com.kronosad.konverse.common.packets.Packet02ChatMessage;
+import com.kronosad.konverse.common.packets.Packet03UserListChange;
 import com.kronosad.konverse.common.user.User;
 
 import java.io.IOException;
@@ -13,6 +14,7 @@ import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.net.ServerSocket;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -51,7 +53,7 @@ public class Server {
         }
 
 
-        System.out.println("Opening com.kronosad.konverse.server on port: " + port);
+        System.out.println("Opening Server on port: " + port);
 
         try {
             server = new ServerSocket(port);
@@ -72,7 +74,7 @@ public class Server {
 
             if (response.equalsIgnoreCase("stop")) {
                 try {
-                    System.out.println("Stopping com.kronosad.konverse.server...");
+                    System.out.println("Stopping Server...");
                     ChatMessage chatMessage = new ChatMessage();
                     chatMessage.setMessage("[WARNING: Server is shutting down, disconnecting all clients!]");
                     chatMessage.setUser(this.serverUser);
@@ -188,6 +190,14 @@ public class Server {
         return null;
     }
 
+    public List<User> getOnlineUsers(){
+        List<User> online = new ArrayList<User>();
+        for(NetworkUser onlineUser : users){
+            online.add(onlineUser);
+        }
+        return online;
+    }
+
     public void serve() {
         new Thread() {
             public void run() {
@@ -203,6 +213,31 @@ public class Server {
         }.start();
 
     }
+
+    public void broadcastUserChange(User user, boolean newUser) throws IOException {
+        sendUserChange();
+
+        ChatMessage message = new ChatMessage();
+        String msg;
+        if(newUser){
+            msg = "joined!";
+        }else{
+            msg = "left!";
+        }
+        message.setMessage(user.getUsername() + " has " + msg);
+        message.setUser(serverUser);
+
+        Packet02ChatMessage chatPacket = new Packet02ChatMessage(Packet.Initiator.SERVER, message);
+
+        sendPacketToClients(chatPacket);
+
+    }
+
+    public void sendUserChange() throws IOException {
+        Packet03UserListChange changePacket = new Packet03UserListChange(Packet.Initiator.SERVER, getOnlineUsers());
+        sendPacketToClients(changePacket);
+    }
+
 
     public Version getVersion() {
         return version;
