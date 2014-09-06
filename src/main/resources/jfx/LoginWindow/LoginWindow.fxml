@@ -5,37 +5,28 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="309.0"
-            prefWidth="254.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.kronosad.konverse.client.window.LoginWindow">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="369.0" prefWidth="254.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.kronosad.konverse.client.window.LoginWindow">
     <children>
         <Label layoutX="66.0" layoutY="21.0" text="Username:" textAlignment="CENTER">
             <font>
-                <Font size="24.0"/>
+                <Font size="24.0" />
             </font>
         </Label>
-        <TextField fx:id="txtUsername" layoutX="20.0" layoutY="69.0" prefHeight="26.0" prefWidth="212.0"
-                   promptText="Username" style="-fx-alignment: center;"/>
-        <ProgressIndicator fx:id="progress" disable="true" layoutX="198.0" layoutY="221.0" prefHeight="28.0"
-                           prefWidth="34.0"/>
+        <TextField fx:id="txtUsername" layoutX="20.0" layoutY="69.0" prefHeight="26.0" prefWidth="212.0" promptText="Username" style="-fx-alignment: center;" />
+        <ProgressIndicator fx:id="progress" disable="true" layoutX="198.0" layoutY="252.0" prefHeight="28.0" prefWidth="34.0" />
         <Label layoutX="97.0" layoutY="123.0" text="Server:" textAlignment="CENTER">
             <font>
-                <Font size="19.0"/>
+                <Font size="19.0" />
             </font>
         </Label>
-        <TextField fx:id="txtAddress" layoutX="21.0" layoutY="159.0" prefHeight="26.0" prefWidth="130.0"
-                   promptText="Server Address" style="-fx-alignment: center;"/>
-        <TextField fx:id="txtPort" layoutX="180.0" layoutY="159.0" prefHeight="26.0" prefWidth="52.0" promptText="Port"
-                   style="-fx-alignment: center;" text="9090"/>
-        <Button fx:id="btnConnect" defaultButton="true" layoutX="20.0" layoutY="266.0" mnemonicParsing="false"
-                onMouseClicked="#connectClick" prefHeight="26.0" prefWidth="212.0" text="Connect!"
-                textAlignment="CENTER"/>
+        <TextField fx:id="txtAddress" layoutX="21.0" layoutY="159.0" prefHeight="26.0" prefWidth="130.0" promptText="Server Address" style="-fx-alignment: center;" />
+        <TextField fx:id="txtPort" layoutX="180.0" layoutY="159.0" prefHeight="26.0" prefWidth="52.0" promptText="Port" style="-fx-alignment: center;" text="9090" />
+        <Button fx:id="btnConnect" defaultButton="true" layoutX="20.0" layoutY="315.0" mnemonicParsing="false" onMouseClicked="#connectClick" prefHeight="26.0" prefWidth="212.0" text="Connect!" textAlignment="CENTER" />
         <Label layoutX="105.0" layoutY="201.0" text="Status:">
             <font>
-                <Font name="System Bold" size="15.0"/>
+                <Font name="System Bold" size="15.0" />
             </font>
         </Label>
-        <Label fx:id="lblStatus" alignment="CENTER" layoutX="15.0" layoutY="229.0" prefHeight="16.0" prefWidth="171.0"
-               text="Waiting..." textAlignment="CENTER"/>
+        <Label fx:id="lblStatus" alignment="CENTER" layoutX="15.0" layoutY="229.0" prefHeight="73.0" prefWidth="171.0" text="Waiting..." textAlignment="CENTER" wrapText="true" />
     </children>
 </AnchorPane>

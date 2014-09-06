@@ -17,7 +17,7 @@ public class Packet00Handshake extends Packet {
     private Version version;
     private String username;
 
-    public Packet00Handshake(Initiator initiator, String username) {
+    public Packet00Handshake(Initiator initiator, String username, Version version) {
         super(Initiator.CLIENT, 0);
 
         if (initiator != Initiator.CLIENT) {
@@ -26,6 +26,7 @@ public class Packet00Handshake extends Packet {
 
         this.setMessage("#Handshake-" + username);
         this.username = username;
+        this.version = version;
 
     }
 

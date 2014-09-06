@@ -1,6 +1,6 @@
 package com.kronosad.konverse.server;
 
-import com.kronosad.konverse.common.KronosKonverseAPI;
+import com.kronosad.konverse.common.KonverseAPI;
 import com.kronosad.konverse.common.objects.ChatMessage;
 import com.kronosad.konverse.common.objects.PrivateMessage;
 import com.kronosad.konverse.common.objects.Version;
@@ -25,7 +25,7 @@ import java.util.Scanner;
 public class Server {
 
     private ServerSocket server;
-    private Version version = KronosKonverseAPI.API_VERSION;
+    private Version version = KonverseAPI.API_VERSION;
 
     protected User serverUser;
     protected ArrayList<NetworkUser> users = new ArrayList<NetworkUser>();
@@ -39,13 +39,10 @@ public class Server {
 
         try {
             Field username = serverUser.getClass().getDeclaredField("username");
-            Field uuid = serverUser.getClass().getDeclaredField("uuid");
 
             username.setAccessible(true);
-            uuid.setAccessible(true);
 
             username.set(serverUser, "Server");
-            uuid.set(serverUser, "--SERVER--");
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {

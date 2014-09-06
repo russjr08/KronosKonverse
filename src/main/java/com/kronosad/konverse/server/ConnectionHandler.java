@@ -2,14 +2,12 @@ package com.kronosad.konverse.server;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.kronosad.konverse.common.KronosKonverseAPI;
 import com.kronosad.konverse.common.objects.ChatMessage;
 import com.kronosad.konverse.common.packets.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.UUID;
 
@@ -66,7 +64,7 @@ public class ConnectionHandler implements Runnable {
 
                         if (handshake.getVersion() == null) {
                             System.out.println("Client " + user.getUsername() + " doesn't have a version set! Disconnecting...");
-                            user.disconnect("Your handshake did not contain a version!", true);
+                            user.sendStatus(Packet05ConnectionStatus.VERSION_MISMATCH, true);
                         }
 
                         if (handshake.getVersion().getProtocol().equalsIgnoreCase(server.getVersion().getProtocol())) {
@@ -77,7 +75,7 @@ public class ConnectionHandler implements Runnable {
                                 if (networkUser.getUsername().equalsIgnoreCase(username) || username.equalsIgnoreCase("server")) {
                                     Packet05ConnectionStatus connectionStatus = new Packet05ConnectionStatus(Packet.Initiator.SERVER, Packet05ConnectionStatus.NICK_IN_USE);
                                     server.sendPacketToClient(user, connectionStatus);
-                                    user.disconnect("Someone is already logged into the server with that name!", true);
+                                    user.sendStatus(Packet05ConnectionStatus.NICK_IN_USE, true);
 
                                 }
                             }
@@ -85,11 +83,11 @@ public class ConnectionHandler implements Runnable {
                             System.out.println("User connected: " + user.getUsername());
                             server.users.add(user);
 
-                            PrintWriter writer = new PrintWriter(client.getOutputStream(), true);
+                            user.sendStatus(Packet05ConnectionStatus.CONNECTION_SUCCESSFUL, false);
 
                             Packet01LoggedIn loggedIn = new Packet01LoggedIn(Packet.Initiator.SERVER, user, server.getOnlineUsers());
 
-                            writer.println(loggedIn.toJSON());
+                            server.sendPacketToClient(user, loggedIn);
 
                             server.broadcastUserChange(user, true);
 
@@ -99,14 +97,13 @@ public class ConnectionHandler implements Runnable {
 
                             System.err.println("Version mismatch! Disconnecting client!");
                             server.users.add(user);
-                            user.disconnect("Your version is out of date! You are running " + handshake.getVersion().getReadable() + " This com.kronosad.konverse.server runs: " + KronosKonverseAPI.API_VERSION.getReadable() +
-                                    " , please download the latest version from https://drone.io/github.com/russjr08/KronosKonverse/files", true);
+                            user.sendStatus(Packet05ConnectionStatus.VERSION_MISMATCH, true);
 
                             if (!client.isClosed()) {
                                 client.close();
 
                             }
-                            manage.stop();
+                            manage.join();
                         }
                         break;
                     case 1:
@@ -143,6 +140,8 @@ public class ConnectionHandler implements Runnable {
                 System.out.println("Client disconnected with exception: " + prettyGson.toJson(user));
                 user.disconnect("Disconnected via Exception", false);
                 break;
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
 

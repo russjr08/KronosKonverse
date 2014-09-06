@@ -1,5 +1,6 @@
 package com.kronosad.konverse.client.window;
 
+import com.kronosad.konverse.common.KonverseAPI;
 import com.kronosad.konverse.common.networking.Network;
 import com.kronosad.konverse.common.packets.Packet;
 import com.kronosad.konverse.common.packets.Packet00Handshake;
@@ -48,7 +49,7 @@ public class LoginWindow implements Initializable {
         progress.setDisable(false);
         lblStatus.setText("Connecting to server...");
 
-        Packet00Handshake handshake = new Packet00Handshake(Packet.Initiator.CLIENT, txtUsername.getText());
+        Packet00Handshake handshake = new Packet00Handshake(Packet.Initiator.CLIENT, txtUsername.getText(), KonverseAPI.API_VERSION);
         Packet05ConnectionStatus status;
 
         try {
@@ -66,8 +67,10 @@ public class LoginWindow implements Initializable {
                     lblStatus.setText("You are prohibited from connecting to this server.");
                     btnConnect.setDisable(false);
                     progress.setDisable(true);
-                } else {
-
+                } else if (status.getStatus() == Packet05ConnectionStatus.VERSION_MISMATCH) {
+                    lblStatus.setText("Client and Server's version does not match!");
+                    btnConnect.setDisable(false);
+                    progress.setDisable(true);
                 }
             }
 

@@ -1,9 +1,10 @@
 package com.kronosad.konverse.common.networking;
 
 import com.google.gson.Gson;
-import com.kronosad.konverse.common.KronosKonverseAPI;
+import com.kronosad.konverse.common.KonverseAPI;
 import com.kronosad.konverse.common.interfaces.INetworkHandler;
 import com.kronosad.konverse.common.objects.ChatMessage;
+import com.kronosad.konverse.common.objects.Version;
 import com.kronosad.konverse.common.packets.*;
 import com.kronosad.konverse.common.user.User;
 
@@ -23,8 +24,8 @@ public class NetworkTestClass implements INetworkHandler {
 
         // Prepare a Handshake packet for the com.kronosad.konverse.server. The purpose of this is to tell the com.kronosad.konverse.server
         // what version we're running and what our username is.
-        Packet00Handshake handshake = new Packet00Handshake(Packet.Initiator.CLIENT, "TestBot");
-        handshake.setVersion(KronosKonverseAPI.API_VERSION);
+        Packet00Handshake handshake = new Packet00Handshake(Packet.Initiator.CLIENT, "TestBot", new Version().setProtocol("2.0-beta").setReadable("2.0 BETA"));
+        handshake.setVersion(KonverseAPI.API_VERSION);
 
         try {
             // Initialize the Network object with the com.kronosad.konverse.server address and port, and of course
@@ -88,7 +89,7 @@ public class NetworkTestClass implements INetworkHandler {
                         messageToSend.setMessage(String.format("Well hello there %s!", chatMessage.getChat().getUser().getUsername()));
                     } else if (chatMessage.getChat().getMessage().equalsIgnoreCase("!version")) {
                         sending = true;
-                        messageToSend.setMessage(String.format("%s, I am utilizing API Version %s", chatMessage.getChat().getUser().getUsername(), KronosKonverseAPI.API_VERSION.getReadable()));
+                        messageToSend.setMessage(String.format("%s, I am utilizing API Version %s", chatMessage.getChat().getUser().getUsername(), KonverseAPI.API_VERSION.getReadable()));
                     } // You can daisy chain more else-if statements here. We'll do one last example here.
                     else if (chatMessage.getChat().getMessage().startsWith("!panic")) {
                         sending = true;

@@ -27,6 +27,7 @@ public class App extends Application implements INetworkHandler {
 
     public static Gson gson = new Gson();
 
+
     private IMessageReceptor messageReceptor;
 
     private static App instance;
@@ -43,6 +44,7 @@ public class App extends Application implements INetworkHandler {
         stage.setTitle("Login");
         stage.setScene(scene);
         stage.show();
+
     }
 
     public static void main(String... args) {

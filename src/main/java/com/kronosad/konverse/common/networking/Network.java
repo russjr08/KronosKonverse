@@ -14,9 +14,9 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 /**
- * This class allows developers to easily access the network and send/receive packets to the com.kronosad.konverse.server.
+ * This class allows developers to easily access the network and send/receive packets to the Server.
  * It is not a static class and should be initialized per-connection.
- * Should not be used for creating a 'com.kronosad.konverse.server', only clients.
+ * Should not be used for creating a 'Server', only clients.
  */
 public class Network {
 
@@ -29,11 +29,11 @@ public class Network {
     private Socket connection;
 
     /**
-     * Used to open a new connection to a com.kronosad.konverse.server and start listening for {@link com.kronosad.konverse.common.packets.Packet}s
+     * Used to open a new connection to a Server and start listening for {@link com.kronosad.konverse.common.packets.Packet}s
      *
-     * @param address   Address of com.kronosad.konverse.server to connect to.
-     * @param port      Port of com.kronosad.konverse.server to connect to.
-     * @param handshake The {@link com.kronosad.konverse.common.packets.Packet00Handshake} to be sent to the com.kronosad.konverse.server when the connection is opened.
+     * @param address   Address of Server to connect to.
+     * @param port      Port of Server to connect to.
+     * @param handshake The {@link com.kronosad.konverse.common.packets.Packet00Handshake} to be sent to the Server when the connection is opened.
      * @throws IOException Thrown in case there was a problem with the Network.
      */
     public Network(String address, int port, Packet00Handshake handshake) throws IOException {
@@ -91,7 +91,7 @@ public class Network {
     }
 
     /**
-     * Disconnects from the com.kronosad.konverse.server.
+     * Disconnects from the Server.
      *
      * @throws IOException
      */
@@ -101,9 +101,9 @@ public class Network {
     }
 
     /**
-     * Used to send a {@link com.kronosad.konverse.common.packets.Packet} to the connected com.kronosad.konverse.server.
+     * Used to send a {@link com.kronosad.konverse.common.packets.Packet} to the connected Server.
      *
-     * @param packet The {@link com.kronosad.konverse.common.packets.Packet} to send to the com.kronosad.konverse.server.
+     * @param packet The {@link com.kronosad.konverse.common.packets.Packet} to send to the Server.
      * @throws IOException Thrown if there was an error sending the {@link com.kronosad.konverse.common.packets.Packet}
      */
     public void sendPacket(Packet packet) throws IOException {

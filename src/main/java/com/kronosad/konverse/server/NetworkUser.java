@@ -2,10 +2,7 @@ package com.kronosad.konverse.server;
 
 import com.google.gson.Gson;
 import com.kronosad.konverse.common.objects.ChatMessage;
-import com.kronosad.konverse.common.packets.Packet;
-import com.kronosad.konverse.common.packets.Packet02ChatMessage;
-import com.kronosad.konverse.common.packets.Packet03UserListChange;
-import com.kronosad.konverse.common.packets.Packet04Disconnect;
+import com.kronosad.konverse.common.packets.*;
 import com.kronosad.konverse.common.user.AuthenticatedUser;
 
 import java.io.IOException;
@@ -37,6 +34,27 @@ public class NetworkUser extends AuthenticatedUser {
         return new Gson().toJson(this);
     }
 
+    public void sendStatus(int status, boolean isKick) {
+        if(socket == null) throw new IllegalAccessError("Socket is null! This must be ran on the Server-Side!");
+
+        Packet05ConnectionStatus packet = new Packet05ConnectionStatus(Packet.Initiator.SERVER, status);
+
+        if (isKick && !socket.isClosed()) {
+            PrintWriter writer;
+            try {
+                writer = new PrintWriter(socket.getOutputStream(), true);
+                writer.println(packet.toJSON());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     /**
      * Should only be used on the Server-Side!
      *
@@ -60,7 +78,7 @@ public class NetworkUser extends AuthenticatedUser {
 
         Server.getInstance().users.remove(this);
 
-        Packet03UserListChange change = new Packet03UserListChange(Packet.Initiator.SERVER, Server.getInstance().users);
+        Packet03UserListChange change = new Packet03UserListChange(Packet.Initiator.SERVER, Server.getInstance().getOnlineUsers());
         change.setMessage("remove");
 
 
@@ -72,7 +90,7 @@ public class NetworkUser extends AuthenticatedUser {
         }
 
         if (isKick && !socket.isClosed()) {
-            PrintWriter writer = null;
+            PrintWriter writer;
             try {
                 writer = new PrintWriter(socket.getOutputStream(), true);
                 writer.println(packet.toJSON());
