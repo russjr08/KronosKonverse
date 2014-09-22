@@ -1,16 +1,17 @@
 package com.kronosad.konverse.client.window;
 
+import com.kronosad.konverse.client.App;
 import com.kronosad.konverse.common.KonverseAPI;
+import com.kronosad.konverse.common.auth.Authentication;
+import com.kronosad.konverse.common.auth.AuthenticationLoggedInMessage;
+import com.kronosad.konverse.common.auth.exceptions.AuthenticationFailedException;
 import com.kronosad.konverse.common.networking.Network;
 import com.kronosad.konverse.common.packets.Packet;
 import com.kronosad.konverse.common.packets.Packet00Handshake;
 import com.kronosad.konverse.common.packets.Packet05ConnectionStatus;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ProgressIndicator;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 
 import java.io.IOException;
@@ -25,6 +26,9 @@ public class LoginWindow implements Initializable {
 
     @FXML
     private TextField txtUsername, txtAddress, txtPort;
+
+    @FXML
+    private PasswordField txtPassword;
 
     @FXML
     private Label lblStatus;
@@ -47,9 +51,44 @@ public class LoginWindow implements Initializable {
         btnConnect.setDisable(true);
 
         progress.setDisable(false);
+        lblStatus.setText("Authenticating...");
+
+        // Attempt authentication.
+        Authentication auth;
+
+        if(App.params.getNamed().containsKey("auth-server")){
+            String authServer = App.params.getNamed().get("auth-server");
+            
+            if(!authServer.endsWith("/")) {
+                authServer += "/";
+            }
+            auth = new Authentication(authServer);
+        } else {
+            auth = new Authentication();
+        }
+
+        String authToken;
+        AuthenticationLoggedInMessage msg;
+        try {
+            msg = auth.login(txtUsername.getText(), txtPassword.getText());
+            System.out.println(msg);
+            authToken = msg.getAuthToken();
+        } catch (IOException e) {
+            e.printStackTrace();
+            lblStatus.setText("Failed to connect to Authentication Server...");
+            btnConnect.setDisable(false);
+            progress.setDisable(true);
+            return;
+        } catch (AuthenticationFailedException e) {
+            e.printStackTrace();
+            lblStatus.setText("Local Authentication Failed!");
+            btnConnect.setDisable(false);
+            progress.setDisable(true);
+            return;
+        }
         lblStatus.setText("Connecting to server...");
 
-        Packet00Handshake handshake = new Packet00Handshake(Packet.Initiator.CLIENT, txtUsername.getText(), KonverseAPI.API_VERSION);
+        Packet00Handshake handshake = new Packet00Handshake(Packet.Initiator.CLIENT, txtUsername.getText(), authToken, KonverseAPI.API_VERSION);
         Packet05ConnectionStatus status;
 
         try {
@@ -69,6 +108,10 @@ public class LoginWindow implements Initializable {
                     progress.setDisable(true);
                 } else if (status.getStatus() == Packet05ConnectionStatus.VERSION_MISMATCH) {
                     lblStatus.setText("Client and Server's version does not match!");
+                    btnConnect.setDisable(false);
+                    progress.setDisable(true);
+                } else if (status.getStatus() == Packet05ConnectionStatus.AUTHENTICATION_FAILED_SERVER_SIDE) {
+                    lblStatus.setText("The server couldn't verify your identity!");
                     btnConnect.setDisable(false);
                     progress.setDisable(true);
                 }

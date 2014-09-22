@@ -27,6 +27,8 @@ public class App extends Application implements INetworkHandler {
 
     public static Gson gson = new Gson();
 
+    public static Parameters params;
+
 
     private IMessageReceptor messageReceptor;
 
@@ -44,6 +46,19 @@ public class App extends Application implements INetworkHandler {
         stage.setTitle("Login");
         stage.setScene(scene);
         stage.show();
+
+        params = this.getParameters();
+
+        if(App.params.getNamed().containsKey("auth-server")){
+            System.out.println("Using custom Authentication Server: " + App.params.getNamed().get("auth-server"));
+            System.err.println("Warning: Using a custom Authentication Server may authenticate you locally, but if the " +
+                    "server is not using the same Authentication Server, then you will fail to connect.");
+
+            if(!App.params.getNamed().get("auth-server").endsWith("/")){
+                System.out.println("Hey! The Auth Server URL you provided didn't end with a trailing slash!" +
+                        " I'll append it for you, but next time could you do that for me? :P");
+            }
+        }
 
     }
 

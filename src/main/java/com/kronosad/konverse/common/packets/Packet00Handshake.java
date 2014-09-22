@@ -16,15 +16,16 @@ public class Packet00Handshake extends Packet {
 
     private Version version;
     private String username;
+    private String auth_token;
 
-    public Packet00Handshake(Initiator initiator, String username, Version version) {
+    public Packet00Handshake(Initiator initiator, String username, String auth_token, Version version) {
         super(Initiator.CLIENT, 0);
-
         if (initiator != Initiator.CLIENT) {
             throw new IllegalArgumentException("The Initiator of this Packet MUST be the client!");
         }
 
         this.setMessage("#Handshake-" + username);
+        this.auth_token = auth_token;
         this.username = username;
         this.version = version;
 
@@ -36,6 +37,10 @@ public class Packet00Handshake extends Packet {
 
     public String getUsername() {
         return username;
+    }
+
+    public String getAuthToken() {
+        return auth_token;
     }
 
     public void setVersion(Version version) {

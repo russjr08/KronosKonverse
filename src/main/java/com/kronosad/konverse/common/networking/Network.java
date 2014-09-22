@@ -126,6 +126,7 @@ public class Network {
 
 
             Packet packet = new Gson().fromJson(response, Packet.class);
+            System.out.println(packet);
             if (packet.getId() != 5) {
                 throw new IllegalArgumentException("Invalid Packet Received: Packet was NOT a connection status packet!");
             }

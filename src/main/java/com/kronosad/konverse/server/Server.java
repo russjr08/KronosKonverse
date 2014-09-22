@@ -1,6 +1,7 @@
 package com.kronosad.konverse.server;
 
 import com.kronosad.konverse.common.KonverseAPI;
+import com.kronosad.konverse.common.auth.Authentication;
 import com.kronosad.konverse.common.objects.ChatMessage;
 import com.kronosad.konverse.common.objects.PrivateMessage;
 import com.kronosad.konverse.common.objects.Version;
@@ -26,6 +27,7 @@ public class Server {
 
     private ServerSocket server;
     private Version version = KonverseAPI.API_VERSION;
+    private Authentication authenticator;
 
     protected User serverUser;
     protected ArrayList<NetworkUser> users = new ArrayList<NetworkUser>();
@@ -34,8 +36,20 @@ public class Server {
 
     protected static Server instance;
 
-    public Server(int port) {
+
+    public Server(String args[]) {
         serverUser = new User();
+
+        for(String string : args) {
+            if(string.contains("--auth-server=")){
+                authenticator = new Authentication(string.split("=")[0]);
+            }
+        }
+
+        if(authenticator == null) {
+            authenticator = new Authentication();
+        }
+
 
         try {
             Field username = serverUser.getClass().getDeclaredField("username");
@@ -50,16 +64,16 @@ public class Server {
         }
 
 
-        System.out.println("Opening Server on port: " + port);
+        System.out.println("Opening Server on port: " + args[0]);
 
         try {
-            server = new ServerSocket(port);
+            server = new ServerSocket(Integer.valueOf(args[0]));
             System.out.println("Sucessfully bounded to port!");
             running = true;
             serve();
         } catch (IOException e) {
             e.printStackTrace();
-            System.err.println("There was a problem binding to port: " + port);
+            System.err.println("There was a problem binding to port: " + args[0]);
         }
 
         instance = this;
@@ -240,8 +254,10 @@ public class Server {
         return version;
     }
 
+    public Authentication getAuthenticator() { return authenticator; }
+
     public static void main(String[] args) {
-        new Server(Integer.valueOf(args[0]));
+        new Server(args);
     }
 
     public static Server getInstance() {

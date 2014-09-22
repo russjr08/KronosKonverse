@@ -62,6 +62,20 @@ public class ConnectionHandler implements Runnable {
 
                         user = new NetworkUser(client, handshake.getMessage().split("-")[1].split(" ")[0], UUID.randomUUID().toString(), false);
 
+                        try {
+                            if (!server.getAuthenticator().verifyAuthToken(user.getUsername(), handshake.getAuthToken())) {
+                                System.err.println("Authentication Server rejected " + user.getUsername() + "'s authentication token!");
+                                user.sendStatus(Packet05ConnectionStatus.AUTHENTICATION_FAILED_SERVER_SIDE, true);
+                                return;
+                            } else {
+                                System.out.println(user.getUsername() + "'s identity has been verified by the Authentication Server!");
+                            }
+                        } catch(IOException e) {
+                            e.printStackTrace();
+                            System.err.println("Failed to contact the Authentication Server, rejecting login!");
+                            user.sendStatus(Packet05ConnectionStatus.AUTHENTICATION_FAILED_SERVER_SIDE, true);
+                        }
+
                         if (handshake.getVersion() == null) {
                             System.out.println("Client " + user.getUsername() + " doesn't have a version set! Disconnecting...");
                             user.sendStatus(Packet05ConnectionStatus.VERSION_MISMATCH, true);

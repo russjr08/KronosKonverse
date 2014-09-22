@@ -24,7 +24,7 @@ public class NetworkTestClass implements INetworkHandler {
 
         // Prepare a Handshake packet for the com.kronosad.konverse.server. The purpose of this is to tell the com.kronosad.konverse.server
         // what version we're running and what our username is.
-        Packet00Handshake handshake = new Packet00Handshake(Packet.Initiator.CLIENT, "TestBot", new Version().setProtocol("2.0-beta").setReadable("2.0 BETA"));
+        Packet00Handshake handshake = new Packet00Handshake(Packet.Initiator.CLIENT, "TestBot", "insert_your_auth_token", new Version().setProtocol("2.0-beta").setReadable("2.0 BETA"));
         handshake.setVersion(KonverseAPI.API_VERSION);
 
         try {

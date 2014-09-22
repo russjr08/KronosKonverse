@@ -13,6 +13,8 @@ public class Packet05ConnectionStatus extends Packet {
     public final static int VERSION_MISMATCH = 3;
     public final static int BANNED = 4;
 
+    public final static int AUTHENTICATION_FAILED_SERVER_SIDE = 5;
+
 
     private int status;
 

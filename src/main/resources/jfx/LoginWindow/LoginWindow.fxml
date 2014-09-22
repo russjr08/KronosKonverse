@@ -5,28 +5,39 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="369.0" prefWidth="254.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.kronosad.konverse.client.window.LoginWindow">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="425.0" prefWidth="254.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.kronosad.konverse.client.window.LoginWindow">
     <children>
-        <Label layoutX="66.0" layoutY="21.0" text="Username:" textAlignment="CENTER">
+        <Label layoutX="42.0" layoutY="21.0" text="Authentication:" textAlignment="CENTER">
             <font>
                 <Font size="24.0" />
             </font>
         </Label>
-        <TextField fx:id="txtUsername" layoutX="20.0" layoutY="69.0" prefHeight="26.0" prefWidth="212.0" promptText="Username" style="-fx-alignment: center;" />
-        <ProgressIndicator fx:id="progress" disable="true" layoutX="198.0" layoutY="252.0" prefHeight="28.0" prefWidth="34.0" />
-        <Label layoutX="97.0" layoutY="123.0" text="Server:" textAlignment="CENTER">
+        <TextField fx:id="txtUsername" layoutX="20.0" layoutY="62.0" prefHeight="26.0" prefWidth="212.0" promptText="Username" style="-fx-alignment: center;" />
+        <PasswordField fx:id="txtPassword" alignment="CENTER" layoutX="20.0" layoutY="95.0" prefHeight="26.0" prefWidth="212.0" promptText="Password" />
+        <ProgressIndicator fx:id="progress" disable="true" layoutX="198.0" layoutY="284.0" prefHeight="28.0" prefWidth="34.0" />
+        <Label layoutX="97.0" layoutY="166.0" text="Server:" textAlignment="CENTER">
             <font>
                 <Font size="19.0" />
             </font>
         </Label>
-        <TextField fx:id="txtAddress" layoutX="21.0" layoutY="159.0" prefHeight="26.0" prefWidth="130.0" promptText="Server Address" style="-fx-alignment: center;" />
-        <TextField fx:id="txtPort" layoutX="180.0" layoutY="159.0" prefHeight="26.0" prefWidth="52.0" promptText="Port" style="-fx-alignment: center;" text="9090" />
-        <Button fx:id="btnConnect" defaultButton="true" layoutX="20.0" layoutY="315.0" mnemonicParsing="false" onMouseClicked="#connectClick" prefHeight="26.0" prefWidth="212.0" text="Connect!" textAlignment="CENTER" />
-        <Label layoutX="105.0" layoutY="201.0" text="Status:">
+        <TextField fx:id="txtAddress" layoutX="21.0" layoutY="202.0" prefHeight="26.0" prefWidth="130.0" promptText="Server Address" style="-fx-alignment: center;" />
+        <TextField fx:id="txtPort" layoutX="180.0" layoutY="202.0" prefHeight="26.0" prefWidth="52.0" promptText="Port" style="-fx-alignment: center;" text="9090" />
+        <Button fx:id="btnConnect" defaultButton="true" layoutX="20.0" layoutY="352.0" mnemonicParsing="false" onMouseClicked="#connectClick" prefHeight="26.0" prefWidth="212.0" text="Connect!" textAlignment="CENTER" />
+        <Label layoutX="105.0" layoutY="243.0" text="Status:">
             <font>
                 <Font name="System Bold" size="15.0" />
             </font>
         </Label>
-        <Label fx:id="lblStatus" alignment="CENTER" layoutX="15.0" layoutY="229.0" prefHeight="73.0" prefWidth="171.0" text="Waiting..." textAlignment="CENTER" wrapText="true" />
+        <Label fx:id="lblStatus" alignment="CENTER" layoutX="15.0" layoutY="261.0" prefHeight="73.0" prefWidth="171.0" text="Waiting..." textAlignment="CENTER" wrapText="true" />
+      <Hyperlink layoutX="64.0" layoutY="142.0" text="http://auth.kronosad.com/">
+         <font>
+            <Font size="10.0" />
+         </font>
+      </Hyperlink>
+      <Label layoutX="99.0" layoutY="131.0" text="Register at:">
+         <font>
+            <Font size="10.0" />
+         </font>
+      </Label>
     </children>
 </AnchorPane>
