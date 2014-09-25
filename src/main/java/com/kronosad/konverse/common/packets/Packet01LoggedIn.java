@@ -33,7 +33,7 @@ public class Packet01LoggedIn extends Packet {
 
     }
 
-    public User getUser() {
+    public AuthenticatedUser getUser() {
         return user;
     }
 

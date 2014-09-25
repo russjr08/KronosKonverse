@@ -5,9 +5,11 @@ import com.kronosad.konverse.client.interfaces.IMessageReceptor;
 import com.kronosad.konverse.common.interfaces.INetworkHandler;
 import com.kronosad.konverse.common.networking.Network;
 import com.kronosad.konverse.common.packets.Packet;
-import com.kronosad.konverse.common.packets.Packet00Handshake;
+import com.kronosad.konverse.common.packets.Packet01LoggedIn;
 import com.kronosad.konverse.common.packets.Packet02ChatMessage;
+import com.kronosad.konverse.common.user.AuthenticatedUser;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -21,18 +23,19 @@ import java.io.IOException;
  */
 public class App extends Application implements INetworkHandler {
 
-    private Network network;
-
     private Stage stage;
+
+    private Network network;
 
     public static Gson gson = new Gson();
 
     public static Parameters params;
 
-
     private IMessageReceptor messageReceptor;
 
     private static App instance;
+
+    private AuthenticatedUser user;
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -46,7 +49,7 @@ public class App extends Application implements INetworkHandler {
         stage.setTitle("Login");
         stage.setScene(scene);
         stage.show();
-
+        stage.setResizable(false);
         params = this.getParameters();
 
         if(App.params.getNamed().containsKey("auth-server")){
@@ -78,20 +81,49 @@ public class App extends Application implements INetworkHandler {
         this.messageReceptor = messageReceptor;
     }
 
-    public void setServer(Packet00Handshake handshake, String address, int port) throws IOException {
-        network = new Network(address, port, handshake);
+    public AuthenticatedUser getLocalUser() { return user; }
 
+    public Network getNetwork() {
+        return network;
     }
 
+    public void setNetwork(Network network) {
+        this.network = network;
+    }
 
     @Override
     public void onPacketReceived(Packet packet, String response) {
         switch(packet.getId()){
-            case 01:
+            case 1:
                 // TODO: Handle login packet here...
+                Packet01LoggedIn loggedIn = gson.fromJson(response, Packet01LoggedIn.class);
+                user = loggedIn.getUser();
+
+                System.out.println("Received AuthenticatedUser from server: " + user.toString());
+
+                Platform.runLater(() -> {
+                    stage.hide();
+                    Parent chatWindow;
+                    try {
+                        chatWindow = FXMLLoader.load(getClass().getClassLoader().getResource("jfx/ChatWindow/ChatWindow.fxml"));
+                        Scene chatScene = new Scene(chatWindow);
+                        stage.setScene(chatScene);
+                        stage.setTitle("You are live!");
+                        stage.show();
+                        stage.setResizable(false);
+                        messageReceptor.handleUserListChange(loggedIn.getLoggedInUsers());
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                });
+
+
                 break;
-            case 02:
+            case 2:
                 Packet02ChatMessage chatPacket = gson.fromJson(response, Packet02ChatMessage.class);
+                System.out.println("Received chat packet: " + response);
                 messageReceptor.handleMessage(chatPacket.getChat());
         }
     }

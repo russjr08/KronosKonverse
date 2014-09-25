@@ -39,7 +39,7 @@ public class NetworkUser extends AuthenticatedUser {
 
         Packet05ConnectionStatus packet = new Packet05ConnectionStatus(Packet.Initiator.SERVER, status);
 
-        if (isKick && !socket.isClosed()) {
+        if (!socket.isClosed()) {
             PrintWriter writer;
             try {
                 writer = new PrintWriter(socket.getOutputStream(), true);
@@ -47,10 +47,12 @@ public class NetworkUser extends AuthenticatedUser {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            try {
-                socket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+            if(isKick) {
+                try {
+                    socket.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }

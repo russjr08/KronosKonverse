@@ -44,4 +44,12 @@ public class User implements INetworkable {
     public String toJSON() {
         return new Gson().toJson(this);
     }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "username='" + username + '\'' +
+                ", elevated=" + elevated +
+                '}';
+    }
 }

@@ -2,7 +2,6 @@ package com.kronosad.konverse.server;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.kronosad.konverse.common.objects.ChatMessage;
 import com.kronosad.konverse.common.packets.*;
 
 import java.io.BufferedReader;
@@ -74,11 +73,15 @@ public class ConnectionHandler implements Runnable {
                             e.printStackTrace();
                             System.err.println("Failed to contact the Authentication Server, rejecting login!");
                             user.sendStatus(Packet05ConnectionStatus.AUTHENTICATION_FAILED_SERVER_SIDE, true);
+                            client.close();
+                            return;
                         }
 
                         if (handshake.getVersion() == null) {
                             System.out.println("Client " + user.getUsername() + " doesn't have a version set! Disconnecting...");
                             user.sendStatus(Packet05ConnectionStatus.VERSION_MISMATCH, true);
+                            client.close();
+                            return;
                         }
 
                         if (handshake.getVersion().getProtocol().equalsIgnoreCase(server.getVersion().getProtocol())) {
@@ -90,7 +93,8 @@ public class ConnectionHandler implements Runnable {
                                     Packet05ConnectionStatus connectionStatus = new Packet05ConnectionStatus(Packet.Initiator.SERVER, Packet05ConnectionStatus.NICK_IN_USE);
                                     server.sendPacketToClient(user, connectionStatus);
                                     user.sendStatus(Packet05ConnectionStatus.NICK_IN_USE, true);
-
+                                    client.close();
+                                    return;
                                 }
                             }
 
@@ -124,28 +128,11 @@ public class ConnectionHandler implements Runnable {
                         break;
                     case 2:
                         Packet02ChatMessage chat = new Gson().fromJson(response, Packet02ChatMessage.class);
-                        if (chat.getChat().getMessage().startsWith("/nick")) {
-                            NetworkUser oldUser = server.getNetworkUserFromUser(chat.getChat().getUser());
-
-                            // TODO: Verify security here...
-                            NetworkUser newUser = new NetworkUser(this.client, chat.getChat().getMessage().split(" ")[1], oldUser.getUuid(), oldUser.isElevated());
-                            server.users.remove(oldUser);
-                            server.users.add(newUser);
-
-                            ChatMessage message = new ChatMessage();
-                            message.setAction(true);
-                            message.setMessage(" is now known as " + newUser.getUsername());
-                            message.setUser(oldUser);
-                            Packet02ChatMessage chatMessage = new Packet02ChatMessage(Packet.Initiator.SERVER, message);
-                            server.sendPacketToClients(chatMessage);
-
-                            server.sendUserChange();
-
-                            Packet01LoggedIn loggedIn = new Packet01LoggedIn(Packet.Initiator.SERVER, newUser, server.getOnlineUsers());
-                            server.sendPacketToClient(newUser, loggedIn);
-                            this.user = newUser;
-                        } else {
+                        if(user.getUuid().equals(chat.getChat().getUser().getUuid())) {
+                            // UUIDs match, proceed with sending message.
                             server.sendPacketToClients(chat);
+                        } else {
+                            user.disconnect("Error! UUIDs do NOT match, user verification failed.", true);
                         }
                 }
 

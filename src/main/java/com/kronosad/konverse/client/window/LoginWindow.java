@@ -39,6 +39,8 @@ public class LoginWindow implements Initializable {
     @FXML
     private Button btnConnect;
 
+    private Network network;
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
@@ -93,7 +95,9 @@ public class LoginWindow implements Initializable {
 
         try {
             lblStatus.setText("Sending handshake...");
-            Network network = new Network(txtAddress.getText(), Integer.valueOf(txtPort.getText()), handshake);
+            network = new Network(txtAddress.getText(), Integer.valueOf(txtPort.getText()), handshake);
+            App.getInstance().setNetwork(network);
+            network.addNetworkHandler(App.getInstance());
 
             status = network.getConnectionStatus();
 
@@ -114,6 +118,10 @@ public class LoginWindow implements Initializable {
                     lblStatus.setText("The server couldn't verify your identity!");
                     btnConnect.setDisable(false);
                     progress.setDisable(true);
+                } else if (status.getStatus() == Packet05ConnectionStatus.CONNECTION_SUCCESSFUL) {
+                    // We've successfully logged into the server. Expect a LoggedIn packet.
+                    lblStatus.setText("Connection successful!");
+                    network.connect(); // If we've connected successfully, start listening for packets.
                 }
             }
 

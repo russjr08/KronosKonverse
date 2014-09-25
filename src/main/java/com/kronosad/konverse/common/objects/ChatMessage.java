@@ -2,7 +2,7 @@ package com.kronosad.konverse.common.objects;
 
 import com.google.gson.Gson;
 import com.kronosad.konverse.common.interfaces.INetworkable;
-import com.kronosad.konverse.common.user.User;
+import com.kronosad.konverse.common.user.AuthenticatedUser;
 
 /**
  * User: russjr08
@@ -13,7 +13,7 @@ public class ChatMessage implements INetworkable {
 
     private boolean serverMsg, action = false;
     private String message;
-    private User user;
+    private AuthenticatedUser user;
 
     public boolean isServerMsg() {
         return serverMsg;
@@ -39,11 +39,11 @@ public class ChatMessage implements INetworkable {
         this.message = message;
     }
 
-    public User getUser() {
+    public AuthenticatedUser getUser() {
         return user;
     }
 
-    public void setUser(User user) {
+    public void setUser(AuthenticatedUser user) {
         this.user = user;
     }
 

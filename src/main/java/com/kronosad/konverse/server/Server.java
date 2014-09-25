@@ -8,6 +8,7 @@ import com.kronosad.konverse.common.objects.Version;
 import com.kronosad.konverse.common.packets.Packet;
 import com.kronosad.konverse.common.packets.Packet02ChatMessage;
 import com.kronosad.konverse.common.packets.Packet03UserListChange;
+import com.kronosad.konverse.common.user.AuthenticatedUser;
 import com.kronosad.konverse.common.user.User;
 
 import java.io.IOException;
@@ -29,7 +30,7 @@ public class Server {
     private Version version = KonverseAPI.API_VERSION;
     private Authentication authenticator;
 
-    protected User serverUser;
+    protected AuthenticatedUser serverUser;
     protected ArrayList<NetworkUser> users = new ArrayList<NetworkUser>();
 
     protected boolean running = false;
@@ -38,7 +39,7 @@ public class Server {
 
 
     public Server(String args[]) {
-        serverUser = new User();
+        serverUser = new AuthenticatedUser();
 
         for(String string : args) {
             if(string.contains("--auth-server=")){
@@ -52,14 +53,12 @@ public class Server {
 
 
         try {
-            Field username = serverUser.getClass().getDeclaredField("username");
+            Field username = serverUser.getClass().getSuperclass().getDeclaredField("username");
 
             username.setAccessible(true);
 
             username.set(serverUser, "Server");
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
+        } catch (NoSuchFieldException | IllegalAccessException e) {
             e.printStackTrace();
         }
 
@@ -241,6 +240,10 @@ public class Server {
         Packet02ChatMessage chatPacket = new Packet02ChatMessage(Packet.Initiator.SERVER, message);
 
         sendPacketToClients(chatPacket);
+
+        Packet03UserListChange changePacket = new Packet03UserListChange(Packet.Initiator.SERVER, getOnlineUsers());
+
+        sendPacketToClients(changePacket);
 
     }
 
