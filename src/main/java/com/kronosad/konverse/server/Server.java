@@ -1,6 +1,9 @@
 package com.kronosad.konverse.server;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.kronosad.konverse.common.KonverseAPI;
+import com.kronosad.konverse.common.auth.AuthenticatedUserProfile;
 import com.kronosad.konverse.common.auth.Authentication;
 import com.kronosad.konverse.common.objects.ChatMessage;
 import com.kronosad.konverse.common.objects.PrivateMessage;
@@ -10,7 +13,12 @@ import com.kronosad.konverse.common.packets.Packet02ChatMessage;
 import com.kronosad.konverse.common.packets.Packet03UserListChange;
 import com.kronosad.konverse.common.user.AuthenticatedUser;
 import com.kronosad.konverse.common.user.User;
+import com.kronosad.konverse.server.misc.OperatorList;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Field;
@@ -18,6 +26,7 @@ import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 /**
  * User: russjr08
@@ -130,6 +139,10 @@ public class Server {
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 }
+            } else if (response.startsWith("op")){
+                String username = response.split(" ")[1];
+                addOP(username);
+
             } else {
                 ChatMessage message = new ChatMessage();
                 message.setMessage(response);
@@ -252,6 +265,64 @@ public class Server {
         sendPacketToClients(changePacket);
     }
 
+    public void addOP(String user) {
+        File oplist = new File("ops.json");
+        OperatorList operatorList = null;
+
+        if(oplist.exists()) {
+            try(FileInputStream inputStream = new FileInputStream("ops.json")) {
+                operatorList = new Gson().fromJson(IOUtils.toString(inputStream), OperatorList.class);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            operatorList = new OperatorList();
+            try {
+                oplist.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        try {
+            AuthenticatedUserProfile profile = getAuthenticator().getUserProfile(user);
+
+            if(profile != null) {
+                operatorList.getOps().add(profile);
+                System.out.println("Adding Server OP: " + user);
+            } else {
+                System.err.println("Authentication Server could not find user!");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Failed to contact Authentication Server!");
+        }
+
+
+        try {
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            FileUtils.write(oplist, gson.toJson(operatorList));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public List<String> getOps() {
+        File oplist = new File("ops.json");
+        OperatorList operatorList;
+        List<String> ops = new ArrayList<String>();
+        if(oplist.exists()) {
+            try(FileInputStream inputStream = new FileInputStream("ops.json")) {
+                operatorList = new Gson().fromJson(IOUtils.toString(inputStream), OperatorList.class);
+                ops.addAll(operatorList.getOps().stream().map(AuthenticatedUserProfile::getUsername).collect(Collectors.toList()));
+                return ops;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return ops;
+    }
 
     public Version getVersion() {
         return version;

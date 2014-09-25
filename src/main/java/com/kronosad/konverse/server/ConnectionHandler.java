@@ -128,6 +128,10 @@ public class ConnectionHandler implements Runnable {
                         break;
                     case 2:
                         Packet02ChatMessage chat = new Gson().fromJson(response, Packet02ChatMessage.class);
+                        if(chat.getChat().isServerMsg()) {
+                            System.out.println("Invalid server message, setting to false.");
+                            chat.getChat().setServerMsg(false);
+                        }
                         if(user.getUuid().equals(chat.getChat().getUser().getUuid())) {
                             // UUIDs match, proceed with sending message.
                             server.sendPacketToClients(chat);

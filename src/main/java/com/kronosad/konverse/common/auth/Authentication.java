@@ -1,14 +1,15 @@
 package com.kronosad.konverse.common.auth;
 
 import com.google.gson.Gson;
-
 import com.kronosad.konverse.common.KonverseAPI;
 import com.kronosad.konverse.common.auth.exceptions.AuthenticationFailedException;
-
+import org.apache.commons.io.IOUtils;
 import org.apache.http.client.fluent.Form;
 import org.apache.http.client.fluent.Request;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 
 /**
  * A utility class for contacting an Authentication Server to login / verify a user's identity. You do not have to use
@@ -94,4 +95,13 @@ public class Authentication {
         return message.getMessage().equalsIgnoreCase(KonverseAPI.AUTHENTICATION_TOKEN_VALID);
     }
 
+    public AuthenticatedUserProfile getUserProfile(String username) throws IOException {
+        InputStream is = new URL(auth_server + "/api/get_user/" + username).openStream();
+        String response = IOUtils.toString(is);
+        AuthenticationMessage msg = new Gson().fromJson(response, AuthenticationMessage.class);
+        if(msg.getMessage().equals(KonverseAPI.AUTHENTICATION_PROFILE_USER_FOUND)) {
+            return new Gson().fromJson(response, AuthenticatedUserProfile.class);
+        }
+        return null;
+    }
 }

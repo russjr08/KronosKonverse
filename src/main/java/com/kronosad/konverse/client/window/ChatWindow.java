@@ -52,6 +52,11 @@ public class ChatWindow implements Initializable, IMessageReceptor {
     }
 
     @Override
+    public void handleNetworkClosed() {
+        // TODO: Handle.
+    }
+
+    @Override
     public void initialize(URL location, ResourceBundle resources) {
         App.getInstance().setMessageReceptor(this);
         userListView.setItems(userList);
