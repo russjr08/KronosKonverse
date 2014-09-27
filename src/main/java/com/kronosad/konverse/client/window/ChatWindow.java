@@ -16,6 +16,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 
 import java.io.IOException;
@@ -47,8 +49,11 @@ public class ChatWindow implements Initializable, IMessageReceptor {
 
     @Override
     public void handleUserListChange(List<User> users) {
-        userList.clear();
-        users.forEach((user) -> userList.add(user.getUsername()));
+        Platform.runLater(() -> {
+            userList.clear();
+            users.forEach((user) -> userList.add(user.getUsername()));
+        });
+
     }
 
     @Override
@@ -64,6 +69,10 @@ public class ChatWindow implements Initializable, IMessageReceptor {
 
     @FXML
     public void sendMessage(MouseEvent event) {
+        send();
+    }
+
+    private void send() {
         ChatMessage chatMessage = new ChatMessage();
         chatMessage.setMessage(txtToSend.getText());
         chatMessage.setUser(App.getInstance().getLocalUser());
@@ -74,6 +83,15 @@ public class ChatWindow implements Initializable, IMessageReceptor {
             App.getInstance().getNetwork().sendPacket(chatPacket);
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            txtToSend.clear();
+        }
+    }
+
+    @FXML
+    public void onKeyReleased(KeyEvent event) {
+        if(event.getCode() == KeyCode.ENTER) {
+            send();
         }
     }
 }

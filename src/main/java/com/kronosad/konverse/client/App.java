@@ -7,6 +7,7 @@ import com.kronosad.konverse.common.networking.Network;
 import com.kronosad.konverse.common.packets.Packet;
 import com.kronosad.konverse.common.packets.Packet01LoggedIn;
 import com.kronosad.konverse.common.packets.Packet02ChatMessage;
+import com.kronosad.konverse.common.packets.Packet03UserListChange;
 import com.kronosad.konverse.common.user.AuthenticatedUser;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -125,6 +126,11 @@ public class App extends Application implements INetworkHandler {
                 Packet02ChatMessage chatPacket = gson.fromJson(response, Packet02ChatMessage.class);
                 System.out.println("Received chat packet: " + response);
                 messageReceptor.handleMessage(chatPacket.getChat());
+                break;
+            case 3:
+                Packet03UserListChange change = gson.fromJson(response, Packet03UserListChange.class);
+                messageReceptor.handleUserListChange(change.getOnlineUsers());
+                break;
         }
     }
 }
