@@ -50,13 +50,13 @@ public class Server {
     public Server(String args[]) {
         serverUser = new AuthenticatedUser();
 
-        for(String string : args) {
-            if(string.contains("--auth-server=")){
+        for (String string : args) {
+            if (string.contains("--auth-server=")) {
                 authenticator = new Authentication(string.split("=")[0]);
             }
         }
 
-        if(authenticator == null) {
+        if (authenticator == null) {
             authenticator = new Authentication();
         }
 
@@ -139,7 +139,7 @@ public class Server {
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 }
-            } else if (response.startsWith("op")){
+            } else if (response.startsWith("op")) {
                 String username = response.split(" ")[1];
                 addOP(username);
 
@@ -213,9 +213,9 @@ public class Server {
         return null;
     }
 
-    public List<User> getOnlineUsers(){
+    public List<User> getOnlineUsers() {
         List<User> online = new ArrayList<User>();
-        for(NetworkUser onlineUser : users){
+        for (NetworkUser onlineUser : users) {
             online.add(onlineUser);
         }
         return online;
@@ -242,9 +242,9 @@ public class Server {
 
         ChatMessage message = new ChatMessage();
         String msg;
-        if(newUser){
+        if (newUser) {
             msg = "joined!";
-        }else{
+        } else {
             msg = "left!";
         }
         message.setMessage(user.getUsername() + " has " + msg);
@@ -269,8 +269,8 @@ public class Server {
         File oplist = new File("ops.json");
         OperatorList operatorList = null;
 
-        if(oplist.exists()) {
-            try(FileInputStream inputStream = new FileInputStream("ops.json")) {
+        if (oplist.exists()) {
+            try (FileInputStream inputStream = new FileInputStream("ops.json")) {
                 operatorList = new Gson().fromJson(IOUtils.toString(inputStream), OperatorList.class);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -287,7 +287,7 @@ public class Server {
         try {
             AuthenticatedUserProfile profile = getAuthenticator().getUserProfile(user);
 
-            if(profile != null) {
+            if (profile != null) {
                 operatorList.getOps().add(profile);
                 System.out.println("Adding Server OP: " + user);
             } else {
@@ -312,8 +312,8 @@ public class Server {
         File oplist = new File("ops.json");
         OperatorList operatorList;
         List<String> ops = new ArrayList<String>();
-        if(oplist.exists()) {
-            try(FileInputStream inputStream = new FileInputStream("ops.json")) {
+        if (oplist.exists()) {
+            try (FileInputStream inputStream = new FileInputStream("ops.json")) {
                 operatorList = new Gson().fromJson(IOUtils.toString(inputStream), OperatorList.class);
                 ops.addAll(operatorList.getOps().stream().map(AuthenticatedUserProfile::getUsername).collect(Collectors.toList()));
                 return ops;
@@ -328,7 +328,9 @@ public class Server {
         return version;
     }
 
-    public Authentication getAuthenticator() { return authenticator; }
+    public Authentication getAuthenticator() {
+        return authenticator;
+    }
 
     public static void main(String[] args) {
         new Server(args);

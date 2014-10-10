@@ -17,6 +17,7 @@ public class AuthenticationLoggedInMessage extends AuthenticationMessage {
      * party sends this to the authentication server and it'll return a message claiming whether the token is valid or
      * not for the username specified. The token is a random sized (up to 100 chars) string that contains both letters
      * and numbers.
+     *
      * @return The authentication token generated for the login session.
      */
     public String getAuthToken() {

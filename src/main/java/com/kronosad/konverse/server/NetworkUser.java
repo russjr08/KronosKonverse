@@ -35,7 +35,7 @@ public class NetworkUser extends AuthenticatedUser {
     }
 
     public void sendStatus(int status, boolean isKick) {
-        if(socket == null) throw new IllegalAccessError("Socket is null! This must be ran on the Server-Side!");
+        if (socket == null) throw new IllegalAccessError("Socket is null! This must be ran on the Server-Side!");
 
         Packet05ConnectionStatus packet = new Packet05ConnectionStatus(Packet.Initiator.SERVER, status);
 
@@ -47,7 +47,7 @@ public class NetworkUser extends AuthenticatedUser {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            if(isKick) {
+            if (isKick) {
                 try {
                     socket.close();
                 } catch (IOException e) {

@@ -23,6 +23,7 @@ public class Authentication {
 
     /**
      * Sets up an authentication object using the default authentication server.
+     *
      * @see com.kronosad.konverse.common.KonverseAPI#DEFAULT_AUTH_SERVER
      */
     public Authentication() {
@@ -33,6 +34,7 @@ public class Authentication {
      * Sets up an Authentication object using a custom authentication server. <STRONG>Obviously, both the client AND
      * the server must use the same authentication server, or the second step of authentication will fail! (Token check)
      * </STRONG>
+     *
      * @param server A custom authentication server to use. Use {@link #Authentication()} for the default authentication
      *               server.
      */
@@ -44,16 +46,14 @@ public class Authentication {
      * Allows logging in to the selected Authentication Server. <STRONG>Please note that the password is encrypted at
      * the server
      * side for the moment. (Using SHA256) </STRONG>
+     *
      * @param username Username of the user.
      * @param password Password of the user.
-     *
      * @return An instance of {@link com.kronosad.konverse.common.auth.AuthenticationLoggedInMessage}
      * which provides the authenticated username and an Authentication Token.
-     *
-     * @throws IOException Thrown if there was an error contacting the Authentication Server.
-     *
+     * @throws IOException                   Thrown if there was an error contacting the Authentication Server.
      * @throws AuthenticationFailedException Thrown if Authentication Failed and contains the message returned
-     * by the Authentication Server.
+     *                                       by the Authentication Server.
      */
     public AuthenticationLoggedInMessage login(String username, String password) throws IOException, AuthenticationFailedException {
         String resultingJson = Request.Post(auth_server + "/api/login/")
@@ -65,7 +65,7 @@ public class Authentication {
         AuthenticationMessage message = new Gson().fromJson(resultingJson, AuthenticationMessage.class);
 
         // Check to see if login was successful or not.
-        if(message.getMessage().equalsIgnoreCase(KonverseAPI.AUTHENTICATION_SUCCESSFUL)) {
+        if (message.getMessage().equalsIgnoreCase(KonverseAPI.AUTHENTICATION_SUCCESSFUL)) {
             return new Gson().fromJson(resultingJson, AuthenticationLoggedInMessage.class);
         } else {
             throw new AuthenticationFailedException("Authentication Server returned: " + message.getMessage());
@@ -78,8 +78,9 @@ public class Authentication {
      * Authentication Server then will send an answer stating whether the token is valid or not. It will only be valid
      * if the token matches AND if the username matches, otherwise the Authentication Server will reply with an "Invalid
      * Token" message.
+     *
      * @param username Username of the user.
-     * @param token Authentication Token of the user provided by the Authentication Server.
+     * @param token    Authentication Token of the user provided by the Authentication Server.
      * @return True if the token and username match. False if they don't match.
      * @throws IOException Thrown if there was an error contacting the Authentication Server.
      */
@@ -99,7 +100,7 @@ public class Authentication {
         InputStream is = new URL(auth_server + "/api/get_user/" + username).openStream();
         String response = IOUtils.toString(is);
         AuthenticationMessage msg = new Gson().fromJson(response, AuthenticationMessage.class);
-        if(msg.getMessage().equals(KonverseAPI.AUTHENTICATION_PROFILE_USER_FOUND)) {
+        if (msg.getMessage().equals(KonverseAPI.AUTHENTICATION_PROFILE_USER_FOUND)) {
             return new Gson().fromJson(response, AuthenticatedUserProfile.class);
         }
         return null;

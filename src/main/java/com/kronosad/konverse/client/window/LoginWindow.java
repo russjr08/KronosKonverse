@@ -58,10 +58,10 @@ public class LoginWindow implements Initializable {
         // Attempt authentication.
         Authentication auth;
 
-        if(App.params.getNamed().containsKey("auth-server")){
+        if (App.params.getNamed().containsKey("auth-server")) {
             String authServer = App.params.getNamed().get("auth-server");
-            
-            if(!authServer.endsWith("/")) {
+
+            if (!authServer.endsWith("/")) {
                 authServer += "/";
             }
             auth = new Authentication(authServer);
@@ -72,6 +72,7 @@ public class LoginWindow implements Initializable {
         String authToken;
         AuthenticationLoggedInMessage msg;
         try {
+            System.out.println("Authenticating with: " + txtUsername.getText());
             msg = auth.login(txtUsername.getText(), txtPassword.getText());
             System.out.println(msg);
             authToken = msg.getAuthToken();

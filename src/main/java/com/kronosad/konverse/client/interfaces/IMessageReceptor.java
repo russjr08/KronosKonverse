@@ -19,8 +19,11 @@ import java.util.List;
 public interface IMessageReceptor {
 
     public void handleMessage(ChatMessage message);
+
     public void handlePrivateMessage(PrivateMessage message);
+
     public void handleUserListChange(List<User> users);
+
     public void handleNetworkClosed();
 
 }

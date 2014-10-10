@@ -29,12 +29,16 @@ import java.util.ResourceBundle;
  * Created by Russell on 5/24/2014.
  */
 public class ChatWindow implements Initializable, IMessageReceptor {
-    @FXML private TextArea txtAreaMessages;
-    @FXML private TextField txtToSend;
+    @FXML
+    private TextArea txtAreaMessages;
+    @FXML
+    private TextField txtToSend;
 
-    @FXML private Button btnSend;
+    @FXML
+    private Button btnSend;
 
-    @FXML private ListView<String> userListView;
+    @FXML
+    private ListView<String> userListView;
     private ObservableList<String> userList = FXCollections.observableArrayList();
 
     @Override
@@ -45,6 +49,8 @@ public class ChatWindow implements Initializable, IMessageReceptor {
     @Override
     public void handlePrivateMessage(PrivateMessage message) {
         // TODO: Handle private messages :P
+        Platform.runLater(() -> txtAreaMessages.appendText("[" + message.getUser().getUsername() + " -> " + App.getInstance().getLocalUser().getUsername() + "] " + message.getMessage() + "\n"));
+
     }
 
     @Override
@@ -90,7 +96,7 @@ public class ChatWindow implements Initializable, IMessageReceptor {
 
     @FXML
     public void onKeyReleased(KeyEvent event) {
-        if(event.getCode() == KeyCode.ENTER) {
+        if (event.getCode() == KeyCode.ENTER) {
             send();
         }
     }

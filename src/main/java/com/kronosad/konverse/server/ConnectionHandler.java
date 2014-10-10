@@ -69,7 +69,7 @@ public class ConnectionHandler implements Runnable {
                             } else {
                                 System.out.println(user.getUsername() + "'s identity has been verified by the Authentication Server!");
                             }
-                        } catch(IOException e) {
+                        } catch (IOException e) {
                             e.printStackTrace();
                             System.err.println("Failed to contact the Authentication Server, rejecting login!");
                             user.sendStatus(Packet05ConnectionStatus.AUTHENTICATION_FAILED_SERVER_SIDE, true);
@@ -110,7 +110,6 @@ public class ConnectionHandler implements Runnable {
                             server.broadcastUserChange(user, true);
 
 
-
                         } else {
 
                             System.err.println("Version mismatch! Disconnecting client!");
@@ -128,11 +127,14 @@ public class ConnectionHandler implements Runnable {
                         break;
                     case 2:
                         Packet02ChatMessage chat = new Gson().fromJson(response, Packet02ChatMessage.class);
-                        if(chat.getChat().isServerMsg()) {
+                        if (chat.getChat().isServerMsg()) {
                             System.out.println("Invalid server message, setting to false.");
                             chat.getChat().setServerMsg(false);
                         }
-                        if(user.getUuid().equals(chat.getChat().getUser().getUuid())) {
+                        if (chat.getChat().getMessage().startsWith("/me")) {
+                            chat.getChat().setAction(true);
+                        }
+                        if (user.getUuid().equals(chat.getChat().getUser().getUuid())) {
                             // UUIDs match, proceed with sending message.
                             server.sendPacketToClients(chat);
                         } else {

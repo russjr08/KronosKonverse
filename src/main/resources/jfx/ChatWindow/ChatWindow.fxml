@@ -4,11 +4,19 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.kronosad.konverse.client.window.ChatWindow">
-   <children>
-      <TextArea fx:id="txtAreaMessages" editable="false" layoutX="2.0" prefHeight="365.0" prefWidth="476.0" wrapText="true" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0" />
-      <TextField fx:id="txtToSend" layoutX="14.0" layoutY="365.0" onKeyReleased="#onKeyReleased" prefHeight="36.0" prefWidth="478.0" promptText="Type your thoughts here!" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" />
-      <Button fx:id="btnSend" defaultButton="true" layoutX="478.0" layoutY="364.0" mnemonicParsing="false" onMouseClicked="#sendMessage" prefHeight="36.0" prefWidth="121.0" text="Send" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="1.0" />
-      <ListView fx:id="userListView" layoutX="478.0" prefHeight="365.0" prefWidth="122.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-   </children>
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0"
+            prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.kronosad.konverse.client.window.ChatWindow">
+    <children>
+        <TextArea fx:id="txtAreaMessages" editable="false" layoutX="2.0" prefHeight="365.0" prefWidth="476.0"
+                  wrapText="true" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0"/>
+        <TextField fx:id="txtToSend" layoutX="14.0" layoutY="365.0" onKeyReleased="#onKeyReleased" prefHeight="36.0"
+                   prefWidth="478.0" promptText="Type your thoughts here!" AnchorPane.bottomAnchor="0.0"
+                   AnchorPane.leftAnchor="0.0"/>
+        <Button fx:id="btnSend" defaultButton="true" layoutX="478.0" layoutY="364.0" mnemonicParsing="false"
+                onMouseClicked="#sendMessage" prefHeight="36.0" prefWidth="121.0" text="Send"
+                AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="1.0"/>
+        <ListView fx:id="userListView" layoutX="478.0" prefHeight="365.0" prefWidth="122.0" AnchorPane.rightAnchor="0.0"
+                  AnchorPane.topAnchor="0.0"/>
+    </children>
 </AnchorPane>

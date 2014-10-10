@@ -40,6 +40,8 @@ public class App extends Application implements INetworkHandler {
 
     @Override
     public void start(Stage stage) throws Exception {
+        Platform.setImplicitExit(true);
+
         instance = this;
         this.stage = stage;
 
@@ -103,7 +105,6 @@ public class App extends Application implements INetworkHandler {
                 System.out.println("Received AuthenticatedUser from server: " + user.toString());
 
                 Platform.runLater(() -> {
-                    stage.hide();
                     Parent chatWindow;
                     try {
                         chatWindow = FXMLLoader.load(getClass().getClassLoader().getResource("jfx/ChatWindow/ChatWindow.fxml"));

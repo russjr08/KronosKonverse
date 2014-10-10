@@ -58,6 +58,7 @@ public class Network {
 
                         Packet packet = new Gson().fromJson(response, Packet.class);
                         if (packet != null) {
+                            System.out.println(response);
                             for (INetworkHandler handler : handlers) {
                                 handler.onPacketReceived(packet, response);
                             }
@@ -111,6 +112,7 @@ public class Network {
             throw new IllegalAccessError("Network connection is already closed!");
         }
         PrintWriter writer = new PrintWriter(connection.getOutputStream(), true);
+        System.out.println(packet.toJSON());
         writer.println(packet.toJSON());
     }
 
