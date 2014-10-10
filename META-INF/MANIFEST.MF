@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Class-Path: dependencies/*
+Main-Class: com.kronosad.konverse.client.App
+
