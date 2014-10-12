@@ -54,6 +54,12 @@ public class App extends Application implements INetworkHandler {
         stage.setScene(scene);
         stage.show();
         stage.setResizable(false);
+
+        stage.setOnCloseRequest((windowEvent) -> {
+            System.out.println("Someone is closing me! D:");
+            Platform.exit();
+        });
+
         params = this.getParameters();
 
         if(App.params.getNamed().containsKey("auth-server")){
@@ -116,6 +122,12 @@ public class App extends Application implements INetworkHandler {
                         stage.setResizable(false);
                         messageReceptor.handleUserListChange(loggedIn.getLoggedInUsers());
                         Notification.Notifier.INSTANCE.notifySuccess("Logged In!", "You have successfully logged in.");
+
+                        stage.setOnCloseRequest((windowEvent) -> {
+                            System.out.println("Someone is closing me! D:");
+                            Platform.exit();
+                            System.exit(0);
+                        });
 
 
                     } catch (IOException e) {
