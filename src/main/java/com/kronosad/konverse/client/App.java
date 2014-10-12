@@ -2,6 +2,7 @@ package com.kronosad.konverse.client;
 
 import com.google.gson.Gson;
 import com.kronosad.konverse.client.interfaces.IMessageReceptor;
+import com.kronosad.konverse.client.notification.Notification;
 import com.kronosad.konverse.common.interfaces.INetworkHandler;
 import com.kronosad.konverse.common.networking.Network;
 import com.kronosad.konverse.common.packets.Packet;
@@ -114,6 +115,8 @@ public class App extends Application implements INetworkHandler {
                         stage.show();
                         stage.setResizable(false);
                         messageReceptor.handleUserListChange(loggedIn.getLoggedInUsers());
+                        Notification.Notifier.INSTANCE.notifySuccess("Logged In!", "You have successfully logged in.");
+
 
                     } catch (IOException e) {
                         e.printStackTrace();

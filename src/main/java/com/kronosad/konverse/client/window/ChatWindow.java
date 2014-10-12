@@ -2,6 +2,7 @@ package com.kronosad.konverse.client.window;
 
 import com.kronosad.konverse.client.App;
 import com.kronosad.konverse.client.interfaces.IMessageReceptor;
+import com.kronosad.konverse.client.notification.Notification;
 import com.kronosad.konverse.common.objects.ChatMessage;
 import com.kronosad.konverse.common.objects.PrivateMessage;
 import com.kronosad.konverse.common.packets.Packet;
@@ -43,7 +44,13 @@ public class ChatWindow implements Initializable, IMessageReceptor {
 
     @Override
     public void handleMessage(ChatMessage message) {
-        Platform.runLater(() -> txtAreaMessages.appendText("[" + message.getUser().getUsername() + "] " + message.getMessage() + "\n"));
+        Platform.runLater(() -> {
+            txtAreaMessages.appendText("[" + message.getUser().getUsername() + "] " + message.getMessage() + "\n");
+            if(message.getMessage().contains(App.getInstance().getLocalUser().getUsername())) {
+                Notification.Notifier.INSTANCE.notifyInfo("Ping!", String.format("%s said your name in chat!", message.getUser().getUsername()));
+            }
+        });
+
     }
 
     @Override
