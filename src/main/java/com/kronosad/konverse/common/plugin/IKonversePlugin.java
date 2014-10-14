@@ -7,7 +7,7 @@ import net.xeoh.plugins.base.Plugin;
  */
 public interface IKonversePlugin extends Plugin {
 
-    public void start();
+    public void start(Side side);
     public void stop();
 
     public String getName();

@@ -11,19 +11,17 @@ import java.util.List;
  */
 public class PluginManager {
 
-    public static Side runningSide = Side.UNKNOWN;
-
     private List<IKonversePlugin> plugins = new ArrayList<>();
 
     net.xeoh.plugins.base.PluginManager pm = PluginManagerFactory.createPluginManager();
 
-    public void loadPlugins(File directory) {
+    public void loadPlugins(File directory, Side side) {
         if(!directory.exists()) directory.mkdirs();
 
         if(directory.isDirectory() && directory.listFiles() != null) {
             for(File file : directory.listFiles()) {
                 if(file.getName().endsWith(".jar")) {
-                    initPlugin(file);
+                    initPlugin(file, side);
                 }
             }
         } else {
@@ -31,11 +29,11 @@ public class PluginManager {
         }
     }
 
-    public void initPlugin(File plugin) {
+    public void initPlugin(File plugin, Side side) {
         pm.addPluginsFrom(plugin.toURI());
         IKonversePlugin konversePlugin = pm.getPlugin(IKonversePlugin.class);
 
-        konversePlugin.start();
+        konversePlugin.start(side);
         plugins.add(konversePlugin);
     }
 
