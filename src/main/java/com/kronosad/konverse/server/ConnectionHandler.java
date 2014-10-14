@@ -90,19 +90,10 @@ public class ConnectionHandler implements Runnable {
 
                             for (NetworkUser networkUser : server.users) {
                                 if (networkUser.getUsername().equalsIgnoreCase(username) || username.equalsIgnoreCase("server")) {
-                                    // TODO: Until connection bugs are fixed, just kick the currently logged in instance of the user.
                                     Packet05ConnectionStatus connectionStatus = new Packet05ConnectionStatus(Packet.Initiator.SERVER, Packet05ConnectionStatus.NICK_IN_USE);
                                     server.sendPacketToClient(user, connectionStatus);
                                     user.sendStatus(Packet05ConnectionStatus.NICK_IN_USE, true);
                                     client.close();
-
-//                                    ChatMessage message = new ChatMessage();
-//                                    message.setMessage("You logged in at another location, so you've been disconnected here.");
-//                                    message.setServerMsg(true);
-//                                    message.setUser(server.serverUser);
-//                                    Packet02ChatMessage msg = new Packet02ChatMessage(Packet.Initiator.SERVER, message);
-//                                    server.sendPacketToClient(networkUser, msg);
-//                                    networkUser.disconnect("You logged in at another location, so you've been disconnected here.", true);
 
                                     break;
                                 }
@@ -141,15 +132,9 @@ public class ConnectionHandler implements Runnable {
                             System.out.println("Invalid server message, setting to false.");
                             chat.getChat().setServerMsg(false);
                         }
-                        if (chat.getChat().getMessage().startsWith("/me")) {
-                            chat.getChat().setAction(true);
-                        }
-                        if (user.getUuid().equals(chat.getChat().getUser().getUuid())) {
-                            // UUIDs match, proceed with sending message.
-                            server.sendPacketToClients(chat);
-                        } else {
-                            user.disconnect("Error! UUIDs do NOT match, user verification failed.", true);
-                        }
+
+                        server.processChat(chat);
+
                 }
 
             } catch (IOException e) {

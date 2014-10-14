@@ -13,6 +13,8 @@ import com.kronosad.konverse.common.packets.Packet02ChatMessage;
 import com.kronosad.konverse.common.packets.Packet03UserListChange;
 import com.kronosad.konverse.common.user.AuthenticatedUser;
 import com.kronosad.konverse.common.user.User;
+import com.kronosad.konverse.server.commands.CommandAction;
+import com.kronosad.konverse.server.commands.ICommand;
 import com.kronosad.konverse.server.misc.OperatorList;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -40,7 +42,9 @@ public class Server {
     private Authentication authenticator;
 
     protected AuthenticatedUser serverUser;
-    protected ArrayList<NetworkUser> users = new ArrayList<NetworkUser>();
+
+    protected List<NetworkUser> users = new ArrayList<NetworkUser>();
+    protected List<ICommand> commands = new ArrayList<>();
 
     protected boolean running = false;
 
@@ -73,6 +77,9 @@ public class Server {
 
 
         System.out.println("Opening Server on port: " + args[0]);
+
+        // Register commands.
+        registerCommand(new CommandAction());
 
         try {
             server = new ServerSocket(Integer.valueOf(args[0]));
@@ -203,6 +210,26 @@ public class Server {
 
     }
 
+    public void processChat(Packet02ChatMessage chat) {
+        boolean isCommand = false;
+        String[] args = chat.getChat().getMessage().split(" ");
+        for(ICommand command : commands) {
+            if(command.getCommand().equalsIgnoreCase(args[0])) {
+                command.run(args, chat);
+                isCommand = true;
+                break;
+            }
+        }
+
+        if(!isCommand){
+            try {
+                sendPacketToClients(chat);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     public NetworkUser getNetworkUserFromUser(User user) {
         for (NetworkUser network : users) {
             if (network.getUsername().equalsIgnoreCase(user.getUsername())) {
@@ -322,6 +349,20 @@ public class Server {
             }
         }
         return ops;
+    }
+
+    public void registerCommand(ICommand command) {
+        for (ICommand iCommand : commands) {
+            if(command.getCommand().equalsIgnoreCase(iCommand.getCommand())) {
+                throw new IllegalArgumentException("There is already a command registered under " + command.getCommand() + "!");
+            }
+        }
+        System.out.println("Registered command: " + command.getCommand());
+        commands.add(command);
+    }
+
+    public void deregisterCommand(ICommand command) {
+        commands.remove(command);
     }
 
     public Version getVersion() {

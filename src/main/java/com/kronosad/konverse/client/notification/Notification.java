@@ -307,6 +307,7 @@ public class Notification {
             timeline.setOnFinished(actionEvent -> Platform.runLater(() -> {
                 POPUP.hide();
                 popups.remove(POPUP);
+                stage.close();
             }));
 
             // Move popup to the right during fade out

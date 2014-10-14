@@ -119,7 +119,7 @@ public class App extends Application implements INetworkHandler {
                         stage.setScene(chatScene);
                         stage.setTitle("You are live!");
                         stage.show();
-                        stage.setResizable(false);
+                        stage.setResizable(true);
                         messageReceptor.handleUserListChange(loggedIn.getLoggedInUsers());
                         Notification.Notifier.INSTANCE.notifySuccess("Logged In!", "You have successfully logged in.");
 
@@ -145,7 +145,8 @@ public class App extends Application implements INetworkHandler {
                 break;
             case 3:
                 Packet03UserListChange change = gson.fromJson(response, Packet03UserListChange.class);
-                messageReceptor.handleUserListChange(change.getOnlineUsers());
+                if(messageReceptor != null)
+                    messageReceptor.handleUserListChange(change.getOnlineUsers()); // This should only happen ONCE.
                 break;
         }
     }

@@ -45,7 +45,11 @@ public class ChatWindow implements Initializable, IMessageReceptor {
     @Override
     public void handleMessage(ChatMessage message) {
         Platform.runLater(() -> {
-            txtAreaMessages.appendText("[" + message.getUser().getUsername() + "] " + message.getMessage() + "\n");
+            if(message.isAction()) {
+                txtAreaMessages.appendText("* " + message.getUser().getUsername() + " " + message.getMessage() + "\n");
+            }else {
+                txtAreaMessages.appendText("[" + message.getUser().getUsername() + "] " + message.getMessage() + "\n");
+            }
             if(message.getMessage().contains(App.getInstance().getLocalUser().getUsername())) {
                 Notification.Notifier.INSTANCE.notifyInfo("Ping!", String.format("%s said your name in chat!", message.getUser().getUsername()));
             }
