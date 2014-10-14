@@ -9,6 +9,8 @@ import com.kronosad.konverse.common.packets.Packet;
 import com.kronosad.konverse.common.packets.Packet01LoggedIn;
 import com.kronosad.konverse.common.packets.Packet02ChatMessage;
 import com.kronosad.konverse.common.packets.Packet03UserListChange;
+import com.kronosad.konverse.common.plugin.PluginManager;
+import com.kronosad.konverse.common.plugin.Side;
 import com.kronosad.konverse.common.user.AuthenticatedUser;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -72,6 +74,8 @@ public class App extends Application implements INetworkHandler {
                         " I'll append it for you, but next time could you do that for me? :P");
             }
         }
+
+        PluginManager.runningSide = Side.CLIENT;
 
     }
 

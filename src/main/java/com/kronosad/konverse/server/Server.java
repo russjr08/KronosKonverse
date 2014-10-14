@@ -11,11 +11,13 @@ import com.kronosad.konverse.common.objects.Version;
 import com.kronosad.konverse.common.packets.Packet;
 import com.kronosad.konverse.common.packets.Packet02ChatMessage;
 import com.kronosad.konverse.common.packets.Packet03UserListChange;
+import com.kronosad.konverse.common.plugin.Side;
 import com.kronosad.konverse.common.user.AuthenticatedUser;
 import com.kronosad.konverse.common.user.User;
 import com.kronosad.konverse.server.commands.CommandAction;
 import com.kronosad.konverse.server.commands.ICommand;
 import com.kronosad.konverse.server.misc.OperatorList;
+import com.kronosad.konverse.common.plugin.PluginManager;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
@@ -40,6 +42,7 @@ public class Server {
     private ServerSocket server;
     private Version version = KonverseAPI.API_VERSION;
     private Authentication authenticator;
+    private PluginManager manager = new PluginManager();
 
     protected AuthenticatedUser serverUser;
 
@@ -93,6 +96,8 @@ public class Server {
 
         instance = this;
 
+        PluginManager.runningSide = Side.SERVER;
+        manager.loadPlugins(new File("plugins/"));
 
         while (running) {
             Scanner in = new Scanner(System.in);

@@ -92,6 +92,13 @@
         </plugins>
     </build>
 
+    <repositories>
+        <repository>
+            <url>http://maven.formreturn.com/repository/</url>
+            <id>jspf-repo</id>
+        </repository>
+    </repositories>
+
     <dependencies>
 
         <!--  Gson: Java to Json conversion -->
@@ -123,6 +130,18 @@
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
             <version>2.4</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>18.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>net.xeoh.jspf</groupId>
+            <artifactId>jspf-core</artifactId>
+            <version>1.0.2</version>
         </dependency>
 
 
