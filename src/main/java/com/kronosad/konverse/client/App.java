@@ -154,4 +154,9 @@ public class App extends Application implements INetworkHandler {
                 break;
         }
     }
+
+    @Override
+    public void onNetworkClosed(Throwable cause) {
+        messageReceptor.handleNetworkClosed();
+    }
 }

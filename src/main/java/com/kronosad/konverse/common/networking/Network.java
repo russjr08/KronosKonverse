@@ -99,6 +99,7 @@ public class Network {
     public void disconnect() throws IOException {
         this.connected = false;
         connection.close();
+        handlers.forEach((handler) -> handler.onNetworkClosed(null));
     }
 
     /**

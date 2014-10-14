@@ -46,15 +46,19 @@ public class ChatWindow implements Initializable, IMessageReceptor {
     public void handleMessage(ChatMessage message) {
         Platform.runLater(() -> {
             if(message.isAction()) {
-                txtAreaMessages.appendText("* " + message.getUser().getUsername() + " " + message.getMessage() + "\n");
+                appendText("* " + message.getUser().getUsername() + " " + message.getMessage() + "\n");
             }else {
-                txtAreaMessages.appendText("[" + message.getUser().getUsername() + "] " + message.getMessage() + "\n");
+                appendText("[" + message.getUser().getUsername() + "] " + message.getMessage() + "\n");
             }
             if(message.getMessage().contains(App.getInstance().getLocalUser().getUsername())) {
                 Notification.Notifier.INSTANCE.notifyInfo("Ping!", String.format("%s said your name in chat!", message.getUser().getUsername()));
             }
         });
 
+    }
+
+    public void appendText(String text) {
+        Platform.runLater(() -> txtAreaMessages.appendText(text));
     }
 
     @Override
@@ -76,6 +80,12 @@ public class ChatWindow implements Initializable, IMessageReceptor {
     @Override
     public void handleNetworkClosed() {
         // TODO: Handle.
+        Platform.runLater(() -> {
+            btnSend.setDisable(true);
+            txtToSend.setDisable(true);
+            txtAreaMessages.setDisable(true);
+        });
+        appendText("ERROR: Disconnected!");
     }
 
     @Override

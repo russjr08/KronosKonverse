@@ -14,4 +14,10 @@ public interface INetworkHandler {
      */
     public void onPacketReceived(Packet packet, String response);
 
+    /**
+     * This method is called whenever the Network connection is closed.
+     * @param cause If an exception caused the disconncet, it will be passed on to here.
+     */
+    public void onNetworkClosed(Throwable cause);
+
 }
