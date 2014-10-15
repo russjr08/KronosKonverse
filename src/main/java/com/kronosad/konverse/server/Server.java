@@ -96,8 +96,7 @@ public class Server {
 
         instance = this;
 
-        PluginManager.runningSide = Side.SERVER;
-        manager.loadPlugins(new File("plugins/"));
+        manager.loadPlugins(new File("plugins/"), Side.SERVER);
 
         while (running) {
             Scanner in = new Scanner(System.in);

@@ -75,8 +75,6 @@ public class App extends Application implements INetworkHandler {
             }
         }
 
-        PluginManager.runningSide = Side.CLIENT;
-
     }
 
     public static void main(String... args) {
