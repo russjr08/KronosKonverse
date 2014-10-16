@@ -84,6 +84,7 @@ public class ChatWindow implements Initializable, IMessageReceptor {
             btnSend.setDisable(true);
             txtToSend.setDisable(true);
             txtAreaMessages.setDisable(true);
+//            userListView.setDisable(true);
         });
         appendText("ERROR: Disconnected!");
     }

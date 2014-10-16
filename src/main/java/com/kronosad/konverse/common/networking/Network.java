@@ -58,7 +58,6 @@ public class Network {
 
                         Packet packet = new Gson().fromJson(response, Packet.class);
                         if (packet != null) {
-                            System.out.println(response);
                             for (INetworkHandler handler : handlers) {
                                 handler.onPacketReceived(packet, response);
                             }
@@ -113,7 +112,6 @@ public class Network {
             throw new IllegalAccessError("Network connection is already closed!");
         }
         PrintWriter writer = new PrintWriter(connection.getOutputStream(), true);
-        System.out.println(packet.toJSON());
         writer.println(packet.toJSON());
     }
 
@@ -129,7 +127,6 @@ public class Network {
 
 
             Packet packet = new Gson().fromJson(response, Packet.class);
-            System.out.println(packet);
             if (packet.getId() != 5) {
                 throw new IllegalArgumentException("Invalid Packet Received: Packet was NOT a connection status packet!");
             }

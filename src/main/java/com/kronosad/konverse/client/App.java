@@ -43,6 +43,8 @@ public class App extends Application implements INetworkHandler {
 
     @Override
     public void start(Stage stage) throws Exception {
+
+        params = this.getParameters();
         Platform.setImplicitExit(true);
 
         instance = this;
@@ -61,8 +63,6 @@ public class App extends Application implements INetworkHandler {
             System.out.println("Someone is closing me! D:");
             Platform.exit();
         });
-
-        params = this.getParameters();
 
         if(App.params.getNamed().containsKey("auth-server")){
             System.out.println("Using custom Authentication Server: " + App.params.getNamed().get("auth-server"));
@@ -142,7 +142,6 @@ public class App extends Application implements INetworkHandler {
                 break;
             case 2:
                 Packet02ChatMessage chatPacket = gson.fromJson(response, Packet02ChatMessage.class);
-                System.out.println("Received chat packet: " + response);
                 messageReceptor.handleMessage(chatPacket.getChat());
                 break;
             case 3:

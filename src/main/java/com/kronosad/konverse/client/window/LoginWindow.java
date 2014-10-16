@@ -43,7 +43,18 @@ public class LoginWindow implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-
+        if (App.params.getNamed().containsKey("username")) {
+            txtUsername.setText(App.params.getNamed().get("username"));
+        }
+        if (App.params.getNamed().containsKey("password")) {
+            txtPassword.setText(App.params.getNamed().get("password"));
+        }
+        if (App.params.getNamed().containsKey("server")) {
+            txtAddress.setText(App.params.getNamed().get("server"));
+        }
+        if (App.params.getNamed().containsKey("auto-login")) {
+            connectClick(null);
+        }
     }
 
     @FXML

@@ -50,6 +50,7 @@ public class Server {
     protected List<ICommand> commands = new ArrayList<>();
 
     protected boolean running = false;
+    private boolean authenticationDisabled = false;
 
     protected static Server instance;
 
@@ -60,6 +61,12 @@ public class Server {
         for (String string : args) {
             if (string.contains("--auth-server=")) {
                 authenticator = new Authentication(string.split("=")[0]);
+            }
+            if (string.contains("--no-auth")) {
+                authenticationDisabled = true;
+                System.err.println("WARNING: You've chosen to disable authentication, this can allow any unverified" +
+                        " user to connect with whatever (or no) credentials. It's recommended you leave authentication" +
+                        " turned on!");
             }
         }
 
@@ -376,6 +383,8 @@ public class Server {
     public Authentication getAuthenticator() {
         return authenticator;
     }
+
+    public boolean isAuthenticationDisabled() { return authenticationDisabled; }
 
     public static void main(String[] args) {
         new Server(args);

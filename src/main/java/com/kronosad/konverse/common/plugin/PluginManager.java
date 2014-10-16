@@ -33,7 +33,10 @@ public class PluginManager {
         pm.addPluginsFrom(plugin.toURI());
         IKonversePlugin konversePlugin = pm.getPlugin(IKonversePlugin.class);
 
+        System.out.println(String.format("Loading plugin %s version %s", konversePlugin.getName(), konversePlugin.getVersion()));
         konversePlugin.start(side);
+        System.out.println(String.format("Loaded plugin %s version %s", konversePlugin.getName(), konversePlugin.getVersion()));
+
         plugins.add(konversePlugin);
     }
 
