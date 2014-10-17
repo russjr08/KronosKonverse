@@ -20,6 +20,7 @@ public class CommandKick implements ICommand {
         if(!packet.getChat().getUser().isElevated()) {
             Server.getInstance().sendMessageToClient(Server.getInstance().getNetworkUserFromUser(packet.getChat().getUser()), "You're not authorized to run this command!");
             System.err.println(String.format("%s tried to run /kick but is unauthorized!", packet.getChat().getUser().getUsername()));
+            return;
         }
 
         if(args.length < 1) {
@@ -32,6 +33,7 @@ public class CommandKick implements ICommand {
             if(user.getUsername().equals(args[0])) {
                 if(user.isElevated()) {
                     Server.getInstance().sendMessageToClient(Server.getInstance().getNetworkUserFromUser(user), "Can't kick other elevated users!");
+                    return;
                 }
                 // Kick the user from the server.
                 // Get the reason from the arguments.
