@@ -3,14 +3,10 @@ package com.kronosad.konverse.client;
 import com.google.gson.Gson;
 import com.kronosad.konverse.client.interfaces.IMessageReceptor;
 import com.kronosad.konverse.client.notification.Notification;
+import com.kronosad.konverse.client.window.ChatWindow;
 import com.kronosad.konverse.common.interfaces.INetworkHandler;
 import com.kronosad.konverse.common.networking.Network;
-import com.kronosad.konverse.common.packets.Packet;
-import com.kronosad.konverse.common.packets.Packet01LoggedIn;
-import com.kronosad.konverse.common.packets.Packet02ChatMessage;
-import com.kronosad.konverse.common.packets.Packet03UserListChange;
-import com.kronosad.konverse.common.plugin.PluginManager;
-import com.kronosad.konverse.common.plugin.Side;
+import com.kronosad.konverse.common.packets.*;
 import com.kronosad.konverse.common.user.AuthenticatedUser;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -116,12 +112,15 @@ public class App extends Application implements INetworkHandler {
                 Platform.runLater(() -> {
                     Parent chatWindow;
                     try {
-                        chatWindow = FXMLLoader.load(getClass().getClassLoader().getResource("jfx/ChatWindow/ChatWindow.fxml"));
+                        FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("jfx/ChatWindow/ChatWindow.fxml"));
+
+                        chatWindow = loader.load();
                         Scene chatScene = new Scene(chatWindow);
                         stage.setScene(chatScene);
                         stage.setTitle("You are live!");
                         stage.show();
                         stage.setResizable(true);
+                        messageReceptor = (ChatWindow)loader.getController();
                         messageReceptor.handleUserListChange(loggedIn.getLoggedInUsers());
                         Notification.Notifier.INSTANCE.notifySuccess("Logged In!", "You have successfully logged in.");
 
@@ -142,13 +141,26 @@ public class App extends Application implements INetworkHandler {
                 break;
             case 2:
                 Packet02ChatMessage chatPacket = gson.fromJson(response, Packet02ChatMessage.class);
-                messageReceptor.handleMessage(chatPacket.getChat());
+                if(messageReceptor != null) {
+                    messageReceptor.handleMessage(chatPacket.getChat());
+                }
                 break;
             case 3:
                 Packet03UserListChange change = gson.fromJson(response, Packet03UserListChange.class);
                 if(messageReceptor != null)
                     messageReceptor.handleUserListChange(change.getOnlineUsers()); // This should only happen ONCE.
                 break;
+            case 4:
+                Packet04Disconnect disconnect = gson.fromJson(response, Packet04Disconnect.class);
+                // TODO: A better way of doing this.
+                if(messageReceptor instanceof ChatWindow) {
+                    ChatWindow window = (ChatWindow)messageReceptor;
+                    if(disconnect.getMessage() != null) {
+                        window.appendText("You were kicked from the server: " + disconnect.getMessage());
+                    } else {
+                        window.appendText("You were kicked form the server (No reason given).");
+                    }
+                }
         }
     }
 

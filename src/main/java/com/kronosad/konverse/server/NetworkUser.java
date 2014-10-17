@@ -73,7 +73,7 @@ public class NetworkUser extends AuthenticatedUser {
         packet.setMessage(reason);
 
         ChatMessage message = new ChatMessage();
-        message.setMessage(this.getUsername() + " has left.");
+//        message.setMessage(this.getUsername() + " has left.");
         message.setUser(Server.getInstance().serverUser);
 
         Packet02ChatMessage chatPacket = new Packet02ChatMessage(Packet.Initiator.SERVER, message);

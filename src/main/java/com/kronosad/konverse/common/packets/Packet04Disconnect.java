@@ -1,7 +1,6 @@
 package com.kronosad.konverse.common.packets;
 
 import com.kronosad.konverse.common.user.User;
-import com.kronosad.konverse.server.NetworkUser;
 
 /**
  * User: russjr08
@@ -21,7 +20,7 @@ public class Packet04Disconnect extends Packet {
      *
      * @param initiator Initiator of said Packet.
      */
-    public Packet04Disconnect(Initiator initiator, NetworkUser disconnected, boolean isKick) {
+    public Packet04Disconnect(Initiator initiator, User disconnected, boolean isKick) {
         super(initiator, 04);
         this.disconnected = disconnected;
         this.isKick = isKick;

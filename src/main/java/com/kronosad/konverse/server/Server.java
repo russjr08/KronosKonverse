@@ -11,13 +11,14 @@ import com.kronosad.konverse.common.objects.Version;
 import com.kronosad.konverse.common.packets.Packet;
 import com.kronosad.konverse.common.packets.Packet02ChatMessage;
 import com.kronosad.konverse.common.packets.Packet03UserListChange;
+import com.kronosad.konverse.common.plugin.PluginManager;
 import com.kronosad.konverse.common.plugin.Side;
 import com.kronosad.konverse.common.user.AuthenticatedUser;
 import com.kronosad.konverse.common.user.User;
 import com.kronosad.konverse.server.commands.CommandAction;
+import com.kronosad.konverse.server.commands.CommandKick;
 import com.kronosad.konverse.server.commands.ICommand;
 import com.kronosad.konverse.server.misc.OperatorList;
-import com.kronosad.konverse.common.plugin.PluginManager;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
@@ -30,7 +31,6 @@ import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-import java.util.stream.Collectors;
 
 /**
  * User: russjr08
@@ -90,6 +90,7 @@ public class Server {
 
         // Register commands.
         registerCommand(new CommandAction());
+        registerCommand(new CommandKick());
 
         try {
             server = new ServerSocket(Integer.valueOf(args[0]));
@@ -181,7 +182,9 @@ public class Server {
     public void sendPacketToClients(Packet packet) throws IOException {
         if (packet instanceof Packet02ChatMessage) {
             Packet02ChatMessage chatPacket = (Packet02ChatMessage) packet;
-            if (((Packet02ChatMessage) packet).getChat().getMessage().isEmpty() || ((Packet02ChatMessage) packet).getChat().getMessage().trim().isEmpty()) {
+            if(chatPacket.getChat().getMessage() == null)
+                return;
+            if (chatPacket.getChat().getMessage().isEmpty() || chatPacket.getChat().getMessage().trim().isEmpty()) {
                 return; /** Null message, don't send. **/}
             if (chatPacket.isPrivate()) {
                 PrivateMessage msg = chatPacket.getPrivateMessage();
@@ -226,7 +229,14 @@ public class Server {
         String[] args = chat.getChat().getMessage().split(" ");
         for(ICommand command : commands) {
             if(command.getCommand().equalsIgnoreCase(args[0])) {
-                command.run(args, chat);
+                List<String> tempArgs = new ArrayList<String>();
+                for (String arg : args) {
+                    tempArgs.add(arg);
+                }
+                tempArgs.remove(0);
+                // Just in case the client is trying to change their identity...
+                chat.getChat().setUser(getNetworkUserFromUser(chat.getChat().getUser()));
+                command.run(tempArgs.toArray(args), chat);
                 isCommand = true;
                 break;
             }
@@ -303,6 +313,35 @@ public class Server {
         sendPacketToClients(changePacket);
     }
 
+    public void sendMessageToClient(NetworkUser user, String text) {
+        ChatMessage message = new ChatMessage();
+        message.setUser(Server.getInstance().getServerUser());
+        message.setMessage(text);
+        Packet02ChatMessage chatPacket = new Packet02ChatMessage(Packet.Initiator.SERVER, message);
+        chatPacket.setPrivate(true);
+
+        // Send it off, to just them.
+        try {
+            sendPacketToClient(getNetworkUserFromUser(user), chatPacket);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendMessageToAllClients(String text) {
+        ChatMessage message = new ChatMessage();
+        message.setUser(Server.getInstance().getServerUser());
+        message.setMessage(text);
+        Packet02ChatMessage chatPacket = new Packet02ChatMessage(Packet.Initiator.SERVER, message);
+
+        // Send it off, to just them.
+        try {
+            sendPacketToClients(chatPacket);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void addOP(String user) {
         File oplist = new File("ops.json");
         OperatorList operatorList = null;
@@ -346,20 +385,16 @@ public class Server {
 
     }
 
-    public List<String> getOps() {
+    public OperatorList getOps() {
         File oplist = new File("ops.json");
-        OperatorList operatorList;
-        List<String> ops = new ArrayList<String>();
         if (oplist.exists()) {
             try (FileInputStream inputStream = new FileInputStream("ops.json")) {
-                operatorList = new Gson().fromJson(IOUtils.toString(inputStream), OperatorList.class);
-                ops.addAll(operatorList.getOps().stream().map(AuthenticatedUserProfile::getUsername).collect(Collectors.toList()));
-                return ops;
+                return new Gson().fromJson(IOUtils.toString(inputStream), OperatorList.class);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        return ops;
+        return new OperatorList();
     }
 
     public void registerCommand(ICommand command) {
@@ -385,6 +420,8 @@ public class Server {
     }
 
     public boolean isAuthenticationDisabled() { return authenticationDisabled; }
+
+    public AuthenticatedUser getServerUser() { return serverUser; }
 
     public static void main(String[] args) {
         new Server(args);

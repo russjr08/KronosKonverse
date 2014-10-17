@@ -41,4 +41,9 @@ public class CommandAction implements ICommand {
     public String getHelpText() {
         return "/me ";
     }
+
+    @Override
+    public void runFromConsole(String[] args) {
+        System.err.println("Console cannot run /me!");
+    }
 }

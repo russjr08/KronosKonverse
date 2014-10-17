@@ -20,6 +20,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.text.Text;
 
 import java.io.IOException;
 import java.net.URL;
@@ -32,6 +33,7 @@ import java.util.ResourceBundle;
 public class ChatWindow implements Initializable, IMessageReceptor {
     @FXML
     private TextArea txtAreaMessages;
+
     @FXML
     private TextField txtToSend;
 
@@ -39,8 +41,8 @@ public class ChatWindow implements Initializable, IMessageReceptor {
     private Button btnSend;
 
     @FXML
-    private ListView<String> userListView;
-    private ObservableList<String> userList = FXCollections.observableArrayList();
+    private ListView<Text> userListView;
+    private ObservableList<Text> userList = FXCollections.observableArrayList();
 
     @Override
     public void handleMessage(ChatMessage message) {
@@ -64,7 +66,7 @@ public class ChatWindow implements Initializable, IMessageReceptor {
     @Override
     public void handlePrivateMessage(PrivateMessage message) {
         // TODO: Handle private messages :P
-        Platform.runLater(() -> txtAreaMessages.appendText("[" + message.getUser().getUsername() + " -> " + App.getInstance().getLocalUser().getUsername() + "] " + message.getMessage() + "\n"));
+        Platform.runLater(() -> appendText("[" + message.getUser().getUsername() + " -> " + App.getInstance().getLocalUser().getUsername() + "] " + message.getMessage() + "\n"));
 
     }
 
@@ -72,9 +74,21 @@ public class ChatWindow implements Initializable, IMessageReceptor {
     public void handleUserListChange(List<User> users) {
         Platform.runLater(() -> {
             userList.clear();
-            users.forEach((user) -> userList.add(user.getUsername()));
+            users.forEach((user) -> userList.add(getTextForUser(user))) ;
         });
 
+    }
+
+    public Text getTextForUser(User user) {
+        Text text = new Text();
+        text.setText(user.getUsername());
+
+        // In the future, maybe call an API to get a user's nickname color?
+        if(user.isElevated()) {
+            text.setStyle("-fx-font-weight:bold;");
+        }
+
+        return text;
     }
 
     @Override
@@ -84,15 +98,15 @@ public class ChatWindow implements Initializable, IMessageReceptor {
             btnSend.setDisable(true);
             txtToSend.setDisable(true);
             txtAreaMessages.setDisable(true);
-//            userListView.setDisable(true);
+            userListView.setDisable(true);
         });
         appendText("ERROR: Disconnected!");
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        App.getInstance().setMessageReceptor(this);
         userListView.setItems(userList);
+
     }
 
     @FXML

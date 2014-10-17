@@ -2,6 +2,8 @@ package com.kronosad.konverse.server;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.kronosad.konverse.common.auth.AuthenticatedUserProfile;
+import com.kronosad.konverse.common.objects.ChatMessage;
 import com.kronosad.konverse.common.packets.*;
 
 import java.io.BufferedReader;
@@ -59,7 +61,16 @@ public class ConnectionHandler implements Runnable {
                         System.out.println(prettyGson.toJson(handshake));
                         System.out.println(handshake.getVersion().toJSON());
 
-                        user = new NetworkUser(client, handshake.getMessage().split("-")[1].split(" ")[0], UUID.randomUUID().toString(), false);
+                        String username = handshake.getMessage().split("-")[1];
+
+                        boolean shouldElevate = false;
+                        for (AuthenticatedUserProfile profile : server.getOps().getOps()) {
+                            if(profile.getUsername().equals(username)) {
+                                shouldElevate = true;
+                            }
+                        }
+
+                        user = new NetworkUser(client, username, UUID.randomUUID().toString(), shouldElevate);
 
                         if(!server.isAuthenticationDisabled()) {
                             try {
@@ -87,19 +98,28 @@ public class ConnectionHandler implements Runnable {
                         }
 
                         if (handshake.getVersion().getProtocol().equalsIgnoreCase(server.getVersion().getProtocol())) {
-                            String username = handshake.getMessage().split("-")[1].split(" ")[0];
-
 
                             for (NetworkUser networkUser : server.users) {
                                 if (networkUser.getUsername().equalsIgnoreCase(username) || username.equalsIgnoreCase("server")) {
+                                    // TODO: Until connection bugs are fixed, just kick the currently logged in instance of the user.
                                     Packet05ConnectionStatus connectionStatus = new Packet05ConnectionStatus(Packet.Initiator.SERVER, Packet05ConnectionStatus.NICK_IN_USE);
-                                    server.sendPacketToClient(user, connectionStatus);
-                                    user.sendStatus(Packet05ConnectionStatus.NICK_IN_USE, true);
-                                    client.close();
+//                                    server.sendPacketToClient(user, connectionStatus);
+//                                    user.sendStatus(Packet05ConnectionStatus.NICK_IN_USE, true);
+//                                    client.close();
+
+                                    ChatMessage message = new ChatMessage();
+                                    message.setMessage("You logged in at another location, so you've been disconnected here.");
+                                    message.setServerMsg(true);
+                                    message.setUser(server.serverUser);
+                                    Packet02ChatMessage msg = new Packet02ChatMessage(Packet.Initiator.SERVER, message);
+                                    server.sendPacketToClient(networkUser, msg);
+                                    networkUser.disconnect("You logged in at another location, so you've been disconnected here.", true);
 
                                     break;
                                 }
                             }
+
+
 
                             System.out.println("User connected: " + user.getUsername());
                             server.users.add(user);
