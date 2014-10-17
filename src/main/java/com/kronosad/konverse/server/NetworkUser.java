@@ -25,6 +25,11 @@ public class NetworkUser extends AuthenticatedUser {
         this.elevated = elevated;
     }
 
+    public void setElevated(boolean elevate) {
+        if (socket == null) throw new IllegalAccessError("Socket is null! This must be ran on the Server-Side!");
+        this.elevated = elevate;
+    }
+
     public Socket getSocket() {
         return socket;
     }

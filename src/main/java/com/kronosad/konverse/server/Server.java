@@ -15,9 +15,7 @@ import com.kronosad.konverse.common.plugin.PluginManager;
 import com.kronosad.konverse.common.plugin.Side;
 import com.kronosad.konverse.common.user.AuthenticatedUser;
 import com.kronosad.konverse.common.user.User;
-import com.kronosad.konverse.server.commands.CommandAction;
-import com.kronosad.konverse.server.commands.CommandKick;
-import com.kronosad.konverse.server.commands.ICommand;
+import com.kronosad.konverse.server.commands.*;
 import com.kronosad.konverse.server.misc.OperatorList;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -91,6 +89,8 @@ public class Server {
         // Register commands.
         registerCommand(new CommandAction());
         registerCommand(new CommandKick());
+        registerCommand(new CommandOP());
+        registerCommand(new CommandDEOP());
 
         try {
             server = new ServerSocket(Integer.valueOf(args[0]));
@@ -383,6 +383,50 @@ public class Server {
             e.printStackTrace();
         }
 
+        for (NetworkUser networkUser : users) {
+            if(networkUser.getUsername().equals(user)) {
+                networkUser.setElevated(true);
+            }
+        }
+
+        Packet03UserListChange change = new Packet03UserListChange(Packet.Initiator.SERVER, getOnlineUsers());
+        change.setMessage("op");
+
+        try {
+            sendPacketToClients(change);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void removeOP(String user) {
+        File oplist = new File("ops.json");
+
+        for (int i = 0; i < getOps().getOps().size(); i++) {
+            AuthenticatedUserProfile profile = getOps().getOps().get(i);
+            if(profile.getUsername().equals(user)) {
+                OperatorList operatorList = getOps();
+
+                operatorList.getOps().remove(i);
+
+                try {
+                    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                    FileUtils.write(oplist, gson.toJson(operatorList));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                Packet03UserListChange change = new Packet03UserListChange(Packet.Initiator.SERVER, getOnlineUsers());
+                change.setMessage("de-op");
+
+                try {
+                    sendPacketToClients(change);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                break;
+            }
+        }
     }
 
     public OperatorList getOps() {
