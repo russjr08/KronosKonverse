@@ -26,9 +26,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.net.ServerSocket;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 /**
  * User: russjr08
@@ -91,6 +89,7 @@ public class Server {
         registerCommand(new CommandKick());
         registerCommand(new CommandOP());
         registerCommand(new CommandDEOP());
+        registerCommand(new CommandHelp());
 
         try {
             server = new ServerSocket(Integer.valueOf(args[0]));
@@ -449,6 +448,14 @@ public class Server {
         }
         System.out.println("Registered command: " + command.getCommand());
         commands.add(command);
+    }
+
+    /**
+     * Returns an unmodifable list of {@link com.kronosad.konverse.server.commands.ICommand}.
+     * @return
+     */
+    public List<ICommand> getCommands() {
+        return Collections.unmodifiableList(commands);
     }
 
     public void deregisterCommand(ICommand command) {

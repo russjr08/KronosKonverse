@@ -31,8 +31,18 @@ public class CommandKick implements ICommand {
 
         for (User user : Server.getInstance().getOnlineUsers()) {
             if(user.getUsername().equals(args[0])) {
+                if(user.getUsername().equalsIgnoreCase(packet.getChat().getUser().getUsername())) {
+                    // Can't kick yourself!
+                    Server.getInstance().sendMessageToClient(
+                            Server.getInstance().getNetworkUserFromUser(packet.getChat().getUser()),
+                            "You can't kick yourself, silly!"
+                    );
+                }
                 if(user.isElevated()) {
-                    Server.getInstance().sendMessageToClient(Server.getInstance().getNetworkUserFromUser(packet.getChat().getUser()), "Can't kick other elevated users!");
+                    // Can't kick other elevated users.
+                    Server.getInstance().sendMessageToClient(
+                            Server.getInstance().getNetworkUserFromUser(packet.getChat().getUser()),
+                            "Can't kick other elevated users!");
                     return;
                 }
                 // Kick the user from the server.
@@ -55,6 +65,14 @@ public class CommandKick implements ICommand {
     public String getHelpText() {
         return "/kick <username> <reason>";
     }
+
+    @Override
+    public String getDescription() {
+        return "Kicks a user from the server.";
+    }
+
+    @Override
+    public boolean requiresElevation() { return true; }
 
     @Override
     public void runFromConsole(String[] args) {

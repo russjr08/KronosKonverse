@@ -25,6 +25,14 @@ public class CommandDEOP implements ICommand {
     }
 
     @Override
+    public String getDescription() {
+        return "De-OPs a User. Can only be ran by the server console!";
+    }
+
+    @Override
+    public boolean requiresElevation() { return true; }
+
+    @Override
     public void runFromConsole(String[] args) {
         if(args.length != 1) {
             System.err.println(getHelpText());

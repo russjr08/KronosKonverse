@@ -26,6 +26,18 @@ public interface ICommand {
     public String getHelpText();
 
     /**
+     * Use this method to return a description of your command to the user.
+     * @return The description of this command.
+     */
+    public String getDescription();
+
+    /**
+     * If your command requires the user to be elevated (such as a kick command), return true here.
+     * @return Whether or not this command requires elevation.
+     */
+    public boolean requiresElevation();
+
+    /**
      * This method will be ran when your command is called by the console, should be similar to
      * {@link com.kronosad.konverse.server.commands.ICommand#run(String[], com.kronosad.konverse.common.packets.Packet02ChatMessage)}.
      */

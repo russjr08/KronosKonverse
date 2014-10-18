@@ -36,6 +36,16 @@ public class CommandOP implements ICommand {
     }
 
     @Override
+    public String getDescription() {
+        return "OPs a User.";
+    }
+
+    @Override
+    public boolean requiresElevation() {
+        return true;
+    }
+
+    @Override
     public void runFromConsole(String[] args) {
         if(args.length != 1) {
             System.err.println(getHelpText());

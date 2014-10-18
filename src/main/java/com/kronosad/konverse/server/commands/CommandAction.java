@@ -43,6 +43,14 @@ public class CommandAction implements ICommand {
     }
 
     @Override
+    public String getDescription() {
+        return "Sends your message in third person!";
+    }
+
+    @Override
+    public boolean requiresElevation() { return false; }
+
+    @Override
     public void runFromConsole(String[] args) {
         System.err.println("Console cannot run /me!");
     }
