@@ -116,8 +116,6 @@ public class ChatWindow implements Initializable, IMessageReceptor {
                             ColorProfile profile = new Gson().fromJson(JSON, ColorProfile.class);
 
                             if(profile.message.equalsIgnoreCase("Color found.")) {
-                                System.out.println("Got Color: " + profile.color);
-//                                text.setStyle(text.getStyle() + " -fx-text-fill: #" + profile.color + ";");
                                 text.setFill(Color.web(profile.color));
                                 colorCaches.put(user.getUsername(), profile.color);
                             }
