@@ -16,18 +16,12 @@ public class CommandOP implements ICommand {
     @Override
     public void run(String[] args, Packet02ChatMessage packet) {
 
-        if(packet.getChat().getUser().isElevated()) {
-            if(args.length < 1) {
-                Server.getInstance().sendMessageToClient(Server.getInstance().getNetworkUserFromUser(packet.getChat().getUser()), getHelpText());
-                return;
-            }
-            Server.getInstance().addOP(args[0]);
-        } else {
-            Server.getInstance().sendMessageToClient(Server.getInstance().getNetworkUserFromUser(packet.getChat().getUser()),
-                    "You do not have permission to run this command!");
-            System.err.println(String.format("%s tried to run /op but is unauthorized!", packet.getChat().getUser().getUsername()));
-
+        if(args.length < 1) {
+            Server.getInstance().sendMessageToClient(Server.getInstance().getNetworkUserFromUser(packet.getChat().getUser()), getHelpText());
+            return;
         }
+        Server.getInstance().addOP(args[0]);
+
     }
 
     @Override
@@ -47,7 +41,7 @@ public class CommandOP implements ICommand {
 
     @Override
     public void runFromConsole(String[] args) {
-        if(args.length != 1) {
+        if(args.length <= 1) {
             System.err.println(getHelpText());
             return;
         }

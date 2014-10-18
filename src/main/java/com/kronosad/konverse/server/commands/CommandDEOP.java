@@ -15,8 +15,7 @@ public class CommandDEOP implements ICommand {
 
     @Override
     public void run(String[] args, Packet02ChatMessage packet) {
-        Server.getInstance().sendMessageToClient(Server.getInstance().getNetworkUserFromUser(packet.getChat().getUser()),
-                "You can not de-op an OP!");
+        // This command can only be ran by the Console.
     }
 
     @Override
@@ -34,10 +33,11 @@ public class CommandDEOP implements ICommand {
 
     @Override
     public void runFromConsole(String[] args) {
-        if(args.length != 1) {
+        if(args.length <= 1) {
             System.err.println(getHelpText());
             return;
         }
+        System.out.println("Removed OP: " + args[0]);
         Server.getInstance().removeOP(args[0]);
     }
 }

@@ -106,73 +106,103 @@ public class Server {
         manager.loadPlugins(new File("plugins/"), Side.SERVER);
 
         while (running) {
+            // Get input from the Server console.
             Scanner in = new Scanner(System.in);
             String response = in.nextLine();
 
-            if (response.equalsIgnoreCase("stop")) {
-                try {
-                    System.out.println("Stopping Server...");
-                    ChatMessage chatMessage = new ChatMessage();
-                    chatMessage.setMessage("[WARNING: Server is shutting down, disconnecting all clients!]");
-                    chatMessage.setUser(this.serverUser);
-                    Packet02ChatMessage chatPacket = new Packet02ChatMessage(Packet.Initiator.SERVER, chatMessage);
-                    sendPacketToClients(chatPacket);
-
-                    for (NetworkUser user : users) {
-                        user.getSocket().close();
+            boolean isCommand = false;
+            String[] cmdArgs = response.split(" ");
+            for(ICommand command : commands) {
+                if(command.getCommand().equalsIgnoreCase(cmdArgs[0])) {
+                    List<String> tempArgs = new ArrayList<String>();
+                    for (String arg : cmdArgs) {
+                        tempArgs.add(arg);
                     }
+                    // Remove the /CommandName part from the Array.
+                    tempArgs.remove(0);
 
-                    this.server.close();
-                    running = false;
+                    command.runFromConsole(tempArgs.toArray(cmdArgs));
+                    isCommand = true;
                     break;
-                } catch (IOException e) {
-                    e.printStackTrace();
                 }
-            } else if (response.startsWith("kick")) {
-                String username = response.split(" ")[1];
-                System.out.println("Kicking user: " + username);
-                StringBuilder kickBuilder = new StringBuilder();
-                for (int i = 0; i < response.split(" ").length; i++) {
-                    if (i != 0 && i != 1) {
-                        kickBuilder.append(response.split(" ")[i] + " ");
-                    }
-                }
+            }
 
-                User user = new User();
+            if(!isCommand){
                 try {
-                    Field usernameField = user.getClass().getDeclaredField("username");
-                    usernameField.setAccessible(true);
-                    usernameField.set(user, username);
-                    NetworkUser networkUser = getNetworkUserFromUser(user);
-                    if (networkUser == null) {
-                        System.out.println("User was not found!");
-
-                    } else {
-                        networkUser.disconnect(kickBuilder.toString(), true);
-
-                    }
-
-                } catch (NoSuchFieldException e) {
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-            } else if (response.startsWith("op")) {
-                String username = response.split(" ")[1];
-                addOP(username);
-
-            } else {
-                ChatMessage message = new ChatMessage();
-                message.setMessage(response);
-                message.setUser(serverUser);
-
-                Packet02ChatMessage packet02ChatMessage = new Packet02ChatMessage(Packet.Initiator.SERVER, message);
-                try {
-                    sendPacketToClients(packet02ChatMessage);
+                    ChatMessage msg = new ChatMessage();
+                    msg.setMessage(response);
+                    msg.setUser(serverUser);
+                    Packet02ChatMessage packet = new Packet02ChatMessage(Packet.Initiator.SERVER, msg);
+                    sendPacketToClients(packet);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
+
+//            if (response.equalsIgnoreCase("stop")) {
+//                try {
+//                    System.out.println("Stopping Server...");
+//                    ChatMessage chatMessage = new ChatMessage();
+//                    chatMessage.setMessage("[WARNING: Server is shutting down, disconnecting all clients!]");
+//                    chatMessage.setUser(this.serverUser);
+//                    Packet02ChatMessage chatPacket = new Packet02ChatMessage(Packet.Initiator.SERVER, chatMessage);
+//                    sendPacketToClients(chatPacket);
+//
+//                    for (NetworkUser user : users) {
+//                        user.getSocket().close();
+//                    }
+//
+//                    this.server.close();
+//                    running = false;
+//                    break;
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            } else if (response.startsWith("kick")) {
+//                String username = response.split(" ")[1];
+//                System.out.println("Kicking user: " + username);
+//                StringBuilder kickBuilder = new StringBuilder();
+//                for (int i = 0; i < response.split(" ").length; i++) {
+//                    if (i != 0 && i != 1) {
+//                        kickBuilder.append(response.split(" ")[i] + " ");
+//                    }
+//                }
+//
+//                User user = new User();
+//                try {
+//                    Field usernameField = user.getClass().getDeclaredField("username");
+//                    usernameField.setAccessible(true);
+//                    usernameField.set(user, username);
+//                    NetworkUser networkUser = getNetworkUserFromUser(user);
+//                    if (networkUser == null) {
+//                        System.out.println("User was not found!");
+//
+//                    } else {
+//                        networkUser.disconnect(kickBuilder.toString(), true);
+//
+//                    }
+//
+//                } catch (NoSuchFieldException e) {
+//                    e.printStackTrace();
+//                } catch (IllegalAccessException e) {
+//                    e.printStackTrace();
+//                }
+//            } else if (response.startsWith("op")) {
+//                String username = response.split(" ")[1];
+//                addOP(username);
+//
+//            } else {
+//                ChatMessage message = new ChatMessage();
+//                message.setMessage(response);
+//                message.setUser(serverUser);
+//
+//                Packet02ChatMessage packet02ChatMessage = new Packet02ChatMessage(Packet.Initiator.SERVER, message);
+//                try {
+//                    sendPacketToClients(packet02ChatMessage);
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            }
 
         }
 
@@ -235,6 +265,16 @@ public class Server {
                 tempArgs.remove(0);
                 // Just in case the client is trying to change their identity...
                 chat.getChat().setUser(getNetworkUserFromUser(chat.getChat().getUser()));
+
+                if(command.requiresElevation() && !chat.getChat().getUser().isElevated()) {
+                    sendMessageToClient(getNetworkUserFromUser(chat.getChat().getUser()),
+                            "You are not authorized to run this command!");
+                    System.err.println(String.format("%s tried to run %s but is unauthorized!",
+                            chat.getChat().getUser().getUsername(), command.getCommand()));
+                    return;
+
+                }
+
                 command.run(tempArgs.toArray(args), chat);
                 isCommand = true;
                 break;
@@ -415,16 +455,23 @@ public class Server {
                     e.printStackTrace();
                 }
 
-                Packet03UserListChange change = new Packet03UserListChange(Packet.Initiator.SERVER, getOnlineUsers());
-                change.setMessage("de-op");
-
-                try {
-                    sendPacketToClients(change);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
                 break;
             }
+        }
+
+        for (NetworkUser networkUser : users) {
+            if(networkUser.getUsername().equals(user)) {
+                networkUser.setElevated(false);
+            }
+        }
+
+        Packet03UserListChange change = new Packet03UserListChange(Packet.Initiator.SERVER, getOnlineUsers());
+        change.setMessage("de-op");
+
+        try {
+            sendPacketToClients(change);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

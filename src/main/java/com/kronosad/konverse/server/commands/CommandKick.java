@@ -17,12 +17,6 @@ public class CommandKick implements ICommand {
     @Override
     public void run(String[] args, Packet02ChatMessage packet) {
 
-        if(!packet.getChat().getUser().isElevated()) {
-            Server.getInstance().sendMessageToClient(Server.getInstance().getNetworkUserFromUser(packet.getChat().getUser()), "You're not authorized to run this command!");
-            System.err.println(String.format("%s tried to run /kick but is unauthorized!", packet.getChat().getUser().getUsername()));
-            return;
-        }
-
         if(args.length < 1) {
             // Create a message with the help text, because the user didn't supply all of the arguments.
             Server.getInstance().sendMessageToClient(Server.getInstance().getNetworkUserFromUser(packet.getChat().getUser()), getHelpText());
