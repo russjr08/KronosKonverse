@@ -54,6 +54,7 @@ public class Server {
     public Server(String args[]) {
         serverUser = new AuthenticatedUser();
 
+        // Check authentication flags.
         for (String string : args) {
             if (string.contains("--auth-server=")) {
                 authenticator = new Authentication(string.split("=")[0]);
@@ -66,11 +67,12 @@ public class Server {
             }
         }
 
+        // If a custom authentication server wasn't set, we'll initialize the authenticator with the default server.
         if (authenticator == null) {
             authenticator = new Authentication();
         }
 
-
+        // Give the server it's own username! Reflection magic.
         try {
             Field username = serverUser.getClass().getSuperclass().getDeclaredField("username");
 
@@ -138,71 +140,6 @@ public class Server {
                     e.printStackTrace();
                 }
             }
-
-//            if (response.equalsIgnoreCase("stop")) {
-//                try {
-//                    System.out.println("Stopping Server...");
-//                    ChatMessage chatMessage = new ChatMessage();
-//                    chatMessage.setMessage("[WARNING: Server is shutting down, disconnecting all clients!]");
-//                    chatMessage.setUser(this.serverUser);
-//                    Packet02ChatMessage chatPacket = new Packet02ChatMessage(Packet.Initiator.SERVER, chatMessage);
-//                    sendPacketToClients(chatPacket);
-//
-//                    for (NetworkUser user : users) {
-//                        user.getSocket().close();
-//                    }
-//
-//                    this.server.close();
-//                    running = false;
-//                    break;
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//            } else if (response.startsWith("kick")) {
-//                String username = response.split(" ")[1];
-//                System.out.println("Kicking user: " + username);
-//                StringBuilder kickBuilder = new StringBuilder();
-//                for (int i = 0; i < response.split(" ").length; i++) {
-//                    if (i != 0 && i != 1) {
-//                        kickBuilder.append(response.split(" ")[i] + " ");
-//                    }
-//                }
-//
-//                User user = new User();
-//                try {
-//                    Field usernameField = user.getClass().getDeclaredField("username");
-//                    usernameField.setAccessible(true);
-//                    usernameField.set(user, username);
-//                    NetworkUser networkUser = getNetworkUserFromUser(user);
-//                    if (networkUser == null) {
-//                        System.out.println("User was not found!");
-//
-//                    } else {
-//                        networkUser.disconnect(kickBuilder.toString(), true);
-//
-//                    }
-//
-//                } catch (NoSuchFieldException e) {
-//                    e.printStackTrace();
-//                } catch (IllegalAccessException e) {
-//                    e.printStackTrace();
-//                }
-//            } else if (response.startsWith("op")) {
-//                String username = response.split(" ")[1];
-//                addOP(username);
-//
-//            } else {
-//                ChatMessage message = new ChatMessage();
-//                message.setMessage(response);
-//                message.setUser(serverUser);
-//
-//                Packet02ChatMessage packet02ChatMessage = new Packet02ChatMessage(Packet.Initiator.SERVER, message);
-//                try {
-//                    sendPacketToClients(packet02ChatMessage);
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//            }
 
         }
 
