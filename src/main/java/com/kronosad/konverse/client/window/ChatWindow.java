@@ -156,23 +156,28 @@ public class ChatWindow implements Initializable, IMessageReceptor {
     }
 
     private void send() {
-        if(txtToSend.getText().length() <= 500) {
-            appendText("Error: Message is too big!");
-            return;
-        }
-        ChatMessage chatMessage = new ChatMessage();
-        chatMessage.setMessage(txtToSend.getText());
-        chatMessage.setUser(App.getInstance().getLocalUser());
+        Platform.runLater(() -> {
+            if(txtToSend.getText().length() >= 500) {
+                appendText("Error: Message is too big!\n");
+                return;
+            }
 
-        Packet02ChatMessage chatPacket = new Packet02ChatMessage(Packet.Initiator.CLIENT, chatMessage);
+            ChatMessage chatMessage = new ChatMessage();
+            chatMessage.setMessage(txtToSend.getText());
+            chatMessage.setUser(App.getInstance().getLocalUser());
 
-        try {
-            App.getInstance().getNetwork().sendPacket(chatPacket);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            txtToSend.clear();
-        }
+            Packet02ChatMessage chatPacket = new Packet02ChatMessage(Packet.Initiator.CLIENT, chatMessage);
+
+            try {
+                App.getInstance().getNetwork().sendPacket(chatPacket);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                txtToSend.clear();
+            }
+
+        });
+
     }
 
     @FXML
