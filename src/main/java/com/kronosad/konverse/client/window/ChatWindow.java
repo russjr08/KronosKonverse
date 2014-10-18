@@ -108,7 +108,7 @@ public class ChatWindow implements Initializable, IMessageReceptor {
                 for (User user : users) {
                     Text text = getTextForUser(user);
                     if(colorCaches.containsKey(user.getUsername())) {
-                        text.setStyle(text.getStyle() + " -fx-text-fill: #" + colorCaches.get(user.getUsername()) + ";");
+                        text.setFill(Color.web(colorCaches.get(user.getUsername())));
                     } else {
                         try {
                             InputStream in = new URL("http://kronosad.com:3000/users/" + user.getUsername()).openStream();
