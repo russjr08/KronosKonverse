@@ -32,7 +32,7 @@ public class CommandKick implements ICommand {
         for (User user : Server.getInstance().getOnlineUsers()) {
             if(user.getUsername().equals(args[0])) {
                 if(user.isElevated()) {
-                    Server.getInstance().sendMessageToClient(Server.getInstance().getNetworkUserFromUser(user), "Can't kick other elevated users!");
+                    Server.getInstance().sendMessageToClient(Server.getInstance().getNetworkUserFromUser(packet.getChat().getUser()), "Can't kick other elevated users!");
                     return;
                 }
                 // Kick the user from the server.
