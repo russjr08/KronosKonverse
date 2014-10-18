@@ -83,7 +83,6 @@ public class ChatWindow implements Initializable, IMessageReceptor {
         Platform.runLater(() -> {
 //            userList.clear();
 //            users.forEach((user) -> userList.add(getTextForUser(user))) ;
-            userList.clear();
             activateColorUsernames(users);
 
         });
@@ -94,7 +93,6 @@ public class ChatWindow implements Initializable, IMessageReceptor {
         Text text = new Text();
         text.setText(user.getUsername());
 
-        // In the future, maybe call an API to get a user's nickname color?
         if(user.isElevated()) {
             text.setStyle("-fx-font-weight:bold;");
         }
@@ -103,32 +101,30 @@ public class ChatWindow implements Initializable, IMessageReceptor {
     }
 
     public void activateColorUsernames(List<User> users) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                for (User user : users) {
-                    Text text = getTextForUser(user);
-                    if(colorCaches.containsKey(user.getUsername())) {
-                        text.setFill(Color.web(colorCaches.get(user.getUsername())));
-                    } else {
-                        try {
-                            InputStream in = new URL("http://kronosad.com:3000/users/" + user.getUsername()).openStream();
-                            String JSON = IOUtils.toString(in);
-                            ColorProfile profile = new Gson().fromJson(JSON, ColorProfile.class);
+        Platform.runLater(userList::clear);
+        for (User user : users) {
+            Text text = getTextForUser(user);
+            if(colorCaches.containsKey(user.getUsername())) {
+                text.setFill(Color.web(colorCaches.get(user.getUsername())));
+            } else {
+                try {
+                    InputStream in = new URL("http://kronosad.com:3000/users/" + user.getUsername()).openStream();
+                    String JSON = IOUtils.toString(in);
+                    if(JSON.startsWith("{")) {
+                        ColorProfile profile = new Gson().fromJson(JSON, ColorProfile.class);
 
-                            if(profile.message.equalsIgnoreCase("Color found.")) {
-                                text.setFill(Color.web(profile.color));
-                                colorCaches.put(user.getUsername(), profile.color);
-                            }
-                        } catch (IOException e) {
-                            e.printStackTrace();
+                        if (profile.message.equalsIgnoreCase("Color found.")) {
+                            text.setFill(Color.web(profile.color));
+                            colorCaches.put(user.getUsername(), profile.color);
                         }
                     }
-
-                    Platform.runLater(() -> userList.add(text));
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
-        }).start();
+
+            Platform.runLater(() -> userList.add(text));
+        }
 
     }
 

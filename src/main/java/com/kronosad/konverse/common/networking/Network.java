@@ -1,6 +1,7 @@
 package com.kronosad.konverse.common.networking;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.kronosad.konverse.common.interfaces.INetworkHandler;
 import com.kronosad.konverse.common.packets.Packet;
 import com.kronosad.konverse.common.packets.Packet00Handshake;
@@ -56,11 +57,15 @@ public class Network {
                             break;
                         }
 
-                        Packet packet = new Gson().fromJson(response, Packet.class);
-                        if (packet != null) {
-                            for (INetworkHandler handler : handlers) {
-                                handler.onPacketReceived(packet, response);
+                        try {
+                            Packet packet = new Gson().fromJson(response, Packet.class);
+                            if (packet != null) {
+                                for (INetworkHandler handler : handlers) {
+                                    handler.onPacketReceived(packet, response);
+                                }
                             }
+                        } catch (JsonSyntaxException e) {
+                            System.err.println("Invalid packet! " + response);
                         }
 
                     } catch (IOException e) {
