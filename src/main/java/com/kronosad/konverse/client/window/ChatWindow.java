@@ -83,7 +83,9 @@ public class ChatWindow implements Initializable, IMessageReceptor {
         Platform.runLater(() -> {
 //            userList.clear();
 //            users.forEach((user) -> userList.add(getTextForUser(user))) ;
+            userList.clear();
             activateColorUsernames(users);
+
         });
 
     }
@@ -104,7 +106,6 @@ public class ChatWindow implements Initializable, IMessageReceptor {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                Platform.runLater(userList::clear);
                 for (User user : users) {
                     Text text = getTextForUser(user);
                     if(colorCaches.containsKey(user.getUsername())) {
