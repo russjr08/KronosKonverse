@@ -150,7 +150,7 @@ public class ConnectionHandler implements Runnable {
                         break;
                     case 2:
                         Packet02ChatMessage chat = new Gson().fromJson(response, Packet02ChatMessage.class);
-                        if(chat.getChat().getMessage().length() <= 550) {
+                        if(chat.getChat().getMessage().length() >= 550) {
                             user.disconnect("Your message was too long!", true);
                         }
                         if (chat.getChat().isServerMsg()) {
