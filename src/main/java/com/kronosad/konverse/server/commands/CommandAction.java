@@ -23,7 +23,7 @@ public class CommandAction implements ICommand {
         msg.setAction(true);
         StringBuilder builder = new StringBuilder();
         for (String arg : args) {
-            if(!arg.equalsIgnoreCase(getCommand())){
+            if(arg != null && !arg.equalsIgnoreCase(getCommand())){
                 builder.append(arg + " ");
             }
         }
