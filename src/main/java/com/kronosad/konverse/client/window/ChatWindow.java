@@ -1,5 +1,6 @@
 package com.kronosad.konverse.client.window;
 
+import com.google.gson.Gson;
 import com.kronosad.konverse.client.App;
 import com.kronosad.konverse.client.interfaces.IMessageReceptor;
 import com.kronosad.konverse.client.notification.Notification;
@@ -20,11 +21,16 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
+import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 /**
@@ -43,6 +49,8 @@ public class ChatWindow implements Initializable, IMessageReceptor {
     @FXML
     private ListView<Text> userListView;
     private ObservableList<Text> userList = FXCollections.observableArrayList();
+
+    private Map<String, String> colorCaches = new HashMap<String, String>();
 
     @Override
     public void handleMessage(ChatMessage message) {
@@ -73,8 +81,9 @@ public class ChatWindow implements Initializable, IMessageReceptor {
     @Override
     public void handleUserListChange(List<User> users) {
         Platform.runLater(() -> {
-            userList.clear();
-            users.forEach((user) -> userList.add(getTextForUser(user))) ;
+//            userList.clear();
+//            users.forEach((user) -> userList.add(getTextForUser(user))) ;
+            activateColorUsernames(users);
         });
 
     }
@@ -89,6 +98,39 @@ public class ChatWindow implements Initializable, IMessageReceptor {
         }
 
         return text;
+    }
+
+    public void activateColorUsernames(List<User> users) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Platform.runLater(userList::clear);
+                for (User user : users) {
+                    Text text = getTextForUser(user);
+                    if(colorCaches.containsKey(user.getUsername())) {
+                        text.setStyle(text.getStyle() + " -fx-text-fill: #" + colorCaches.get(user.getUsername()) + ";");
+                    } else {
+                        try {
+                            InputStream in = new URL("http://kronosad.com:3000/users/" + user.getUsername()).openStream();
+                            String JSON = IOUtils.toString(in);
+                            ColorProfile profile = new Gson().fromJson(JSON, ColorProfile.class);
+
+                            if(profile.message.equalsIgnoreCase("Color found.")) {
+                                System.out.println("Got Color: " + profile.color);
+//                                text.setStyle(text.getStyle() + " -fx-text-fill: #" + profile.color + ";");
+                                text.setFill(Color.web(profile.color));
+                                colorCaches.put(user.getUsername(), profile.color);
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    Platform.runLater(() -> userList.add(text));
+                }
+            }
+        }).start();
+
     }
 
     @Override
@@ -136,4 +178,9 @@ public class ChatWindow implements Initializable, IMessageReceptor {
             send();
         }
     }
+}
+
+class ColorProfile {
+    public String message;
+    public String color;
 }
