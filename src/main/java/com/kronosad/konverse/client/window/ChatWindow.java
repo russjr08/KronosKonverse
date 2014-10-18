@@ -156,6 +156,10 @@ public class ChatWindow implements Initializable, IMessageReceptor {
     }
 
     private void send() {
+        if(txtToSend.getText().length() <= 500) {
+            appendText("Error: Message is too big!");
+            return;
+        }
         ChatMessage chatMessage = new ChatMessage();
         chatMessage.setMessage(txtToSend.getText());
         chatMessage.setUser(App.getInstance().getLocalUser());
