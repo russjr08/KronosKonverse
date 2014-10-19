@@ -1,5 +1,6 @@
 package com.kronosad.konverse.server;
 
+import com.google.common.eventbus.EventBus;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.kronosad.konverse.common.KonverseAPI;
@@ -16,6 +17,7 @@ import com.kronosad.konverse.common.plugin.Side;
 import com.kronosad.konverse.common.user.AuthenticatedUser;
 import com.kronosad.konverse.common.user.User;
 import com.kronosad.konverse.server.commands.*;
+import com.kronosad.konverse.server.events.ChatReceivedEvent;
 import com.kronosad.konverse.server.misc.OperatorList;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -47,6 +49,8 @@ public class Server {
     private boolean authenticationDisabled = false;
 
     protected static Server instance;
+
+    public EventBus eventBus;
 
 
     private Server(String args[]) {
@@ -209,6 +213,9 @@ public class Server {
     protected void processChat(Packet02ChatMessage chat) {
         boolean isCommand = false;
         String[] args = chat.getChat().getMessage().split(" ");
+
+        eventBus.post(new ChatReceivedEvent(chat));
+
         for(ICommand command : commands) {
             if(command.getCommand().equalsIgnoreCase(args[0])) {
                 List<String> tempArgs = new ArrayList<String>();

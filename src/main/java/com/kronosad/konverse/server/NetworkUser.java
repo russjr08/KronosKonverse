@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.kronosad.konverse.common.objects.ChatMessage;
 import com.kronosad.konverse.common.packets.*;
 import com.kronosad.konverse.common.user.AuthenticatedUser;
+import com.kronosad.konverse.server.events.UserKickedEvent;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -83,6 +84,7 @@ public class NetworkUser extends AuthenticatedUser {
 
         Packet02ChatMessage chatPacket = new Packet02ChatMessage(Packet.Initiator.SERVER, message);
 
+        Server.getInstance().eventBus.post(new UserKickedEvent(this, reason, isKick));
         Server.getInstance().users.remove(this);
 
         Packet03UserListChange change = new Packet03UserListChange(Packet.Initiator.SERVER, Server.getInstance().getOnlineUsers());

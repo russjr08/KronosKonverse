@@ -5,6 +5,8 @@ import com.google.gson.GsonBuilder;
 import com.kronosad.konverse.common.auth.AuthenticatedUserProfile;
 import com.kronosad.konverse.common.objects.ChatMessage;
 import com.kronosad.konverse.common.packets.*;
+import com.kronosad.konverse.server.events.UserJoinedEvent;
+import com.kronosad.konverse.server.events.UserLeftEvent;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -46,6 +48,7 @@ public class ConnectionHandler implements Runnable {
                 if (response == null || response.equals("-1")) {
                     System.out.println("Client disconnected: " + user.getUsername());
                     server.users.remove(user);
+                    server.eventBus.post(new UserLeftEvent(user, null));
                     server.broadcastUserChange(user, false);
                     client.close();
 
@@ -120,6 +123,7 @@ public class ConnectionHandler implements Runnable {
 
 
                             System.out.println("User connected: " + user.getUsername());
+                            server.eventBus.post(new UserJoinedEvent(user));
                             server.users.add(user);
 
                             user.sendStatus(Packet05ConnectionStatus.CONNECTION_SUCCESSFUL, false);
@@ -163,6 +167,7 @@ public class ConnectionHandler implements Runnable {
             } catch (IOException e) {
                 e.printStackTrace();
                 System.out.println("Client disconnected with exception: " + prettyGson.toJson(user));
+                server.eventBus.post(new UserLeftEvent(user, e));
                 user.disconnect("Disconnected via Exception", false);
                 break;
             } catch (InterruptedException e) {
