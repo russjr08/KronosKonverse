@@ -50,7 +50,7 @@ public class Server {
 
     protected static Server instance;
 
-    public EventBus eventBus;
+    public EventBus eventBus = new EventBus();
 
 
     private Server(String args[]) {
