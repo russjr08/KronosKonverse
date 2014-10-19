@@ -94,6 +94,7 @@ public class Server {
         registerCommand(new CommandOP());
         registerCommand(new CommandDEOP());
         registerCommand(new CommandHelp());
+        registerCommand(new CommandStop());
 
         try {
             server = new ServerSocket(Integer.valueOf(args[0]));
