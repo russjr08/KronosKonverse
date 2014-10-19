@@ -51,7 +51,7 @@ public class Server {
     protected static Server instance;
 
 
-    public Server(String args[]) {
+    private Server(String args[]) {
         serverUser = new AuthenticatedUser();
 
         // Check authentication flags.
@@ -145,6 +145,11 @@ public class Server {
 
     }
 
+    /**
+     * Sends a {@link com.kronosad.konverse.common.packets.Packet} to all connected clients.
+     * @param packet The {@link com.kronosad.konverse.common.packets.Packet} to send to the clients.
+     * @throws IOException Thrown if there was a problem sending the packet.
+     */
     public void sendPacketToClients(Packet packet) throws IOException {
         if (packet instanceof Packet02ChatMessage) {
             Packet02ChatMessage chatPacket = (Packet02ChatMessage) packet;
@@ -176,6 +181,13 @@ public class Server {
 
     }
 
+    /**
+     * Sends a {@link com.kronosad.konverse.common.packets.Packet} to a specific client.
+     * @param user The {@link com.kronosad.konverse.server.NetworkUser} to send the {@link com.kronosad.konverse.common.packets.Packet} to.
+     * @param packet The {@link com.kronosad.konverse.common.packets.Packet} to send to the {@link com.kronosad.konverse.server.NetworkUser}.
+     * @throws IOException Thrown if there was a problem sending the packet.
+     * @see #getNetworkUserFromUser(com.kronosad.konverse.common.user.User) to obtain a valid instance of {@link com.kronosad.konverse.server.NetworkUser}.
+     */
     public void sendPacketToClient(NetworkUser user, Packet packet) throws IOException {
         if (packet instanceof Packet02ChatMessage) {
             Packet02ChatMessage chatPacket = (Packet02ChatMessage) packet;
@@ -190,7 +202,13 @@ public class Server {
 
     }
 
-    public void processChat(Packet02ChatMessage chat) {
+    /**
+     * Takes a {@link com.kronosad.konverse.common.packets.Packet02ChatMessage} and determines if it's an {@link com.kronosad.konverse.server.commands.ICommand},
+     * if it is, then we'll go through all registered commands and run the matching one. Otherwise, we'll send it off to all users.
+     * @param chat The {@link com.kronosad.konverse.common.packets.Packet02ChatMessage} to be processed.
+     * @see #registerCommand(com.kronosad.konverse.server.commands.ICommand) To register a Command.
+     */
+    protected void processChat(Packet02ChatMessage chat) {
         boolean isCommand = false;
         String[] args = chat.getChat().getMessage().split(" ");
         for(ICommand command : commands) {
@@ -227,6 +245,12 @@ public class Server {
         }
     }
 
+    /**
+     * Returns a valid instance of {@link com.kronosad.konverse.server.NetworkUser} from a regular
+     * {@link com.kronosad.konverse.common.user.User} object (Such as from a Chat Packet/Message)
+     * @param user The {@link com.kronosad.konverse.common.user.User} to get the {@link com.kronosad.konverse.server.NetworkUser} from.
+     * @return
+     */
     public NetworkUser getNetworkUserFromUser(User user) {
         for (NetworkUser network : users) {
             if (network.getUsername().equalsIgnoreCase(user.getUsername())) {
@@ -237,6 +261,10 @@ public class Server {
         return null;
     }
 
+    /**
+     * Returns a {@link java.util.List} of Online Users.
+     * @return A {@link java.util.List} of currently online users.
+     */
     public List<User> getOnlineUsers() {
         List<User> online = new ArrayList<User>();
         for (NetworkUser onlineUser : users) {
@@ -245,7 +273,10 @@ public class Server {
         return online;
     }
 
-    public void serve() {
+    /**
+     * Listens for all incoming connections, and opens a {@link com.kronosad.konverse.server.ConnectionHandler} for them in a new {@link java.lang.Thread}.
+     */
+    private void serve() {
         new Thread() {
             public void run() {
                 while (running) {
@@ -261,6 +292,12 @@ public class Server {
 
     }
 
+    /**
+     * Sends a {@link com.kronosad.konverse.common.packets.Packet03UserListChange} to all connected clients and broadcasts it as a Chat Message.
+     * @param user The {@link com.kronosad.konverse.common.user.User} who either connected, or dropped out.
+     * @param newUser Did the new {@link com.kronosad.konverse.common.user.User} just connect, or have they left?
+     * @throws IOException If the broadcast was unsuccessful.
+     */
     public void broadcastUserChange(User user, boolean newUser) throws IOException {
         sendUserChange();
 
@@ -284,11 +321,20 @@ public class Server {
 
     }
 
+    /**
+     * Similar to the {@link #broadcastUserChange(com.kronosad.konverse.common.user.User, boolean)} method, but doesn't broadcast it as a chat message.
+     * @throws IOException
+     */
     public void sendUserChange() throws IOException {
         Packet03UserListChange changePacket = new Packet03UserListChange(Packet.Initiator.SERVER, getOnlineUsers());
         sendPacketToClients(changePacket);
     }
 
+    /**
+     * A utility method for sending a string of text to a specific clients.
+     * @param user The User to send this message to.
+     * @param text The String of text to send to the User.
+     */
     public void sendMessageToClient(NetworkUser user, String text) {
         ChatMessage message = new ChatMessage();
         message.setUser(Server.getInstance().getServerUser());
@@ -304,6 +350,10 @@ public class Server {
         }
     }
 
+    /**
+     * Broadcasts a message
+     * @param text
+     */
     public void sendMessageToAllClients(String text) {
         ChatMessage message = new ChatMessage();
         message.setUser(Server.getInstance().getServerUser());
@@ -318,6 +368,10 @@ public class Server {
         }
     }
 
+    /**
+     * Adds an OP to the Server's OP List. (Retrieves the Account profile from the Auth Server this Server was started with.)
+     * @param user Username of the user to add to the OP List.
+     */
     public void addOP(String user) {
         File oplist = new File("ops.json");
         OperatorList operatorList = null;
@@ -375,6 +429,10 @@ public class Server {
         }
     }
 
+    /**
+     * Removes an OP fromt he Server's OP List.
+     * @param user The User to remove from the Server's OP List.
+     */
     public void removeOP(String user) {
         File oplist = new File("ops.json");
 
@@ -412,6 +470,11 @@ public class Server {
         }
     }
 
+    /**
+     * Retrieves an instance of {@link com.kronosad.konverse.server.misc.OperatorList} which contains a {@link java.util.List}
+     * of {@link com.kronosad.konverse.common.auth.AuthenticatedUserProfile}s.
+     * @return
+     */
     public OperatorList getOps() {
         File oplist = new File("ops.json");
         if (oplist.exists()) {
@@ -424,6 +487,10 @@ public class Server {
         return new OperatorList();
     }
 
+    /**
+     * Register's an {@link com.kronosad.konverse.server.commands.ICommand} to the Server's internal Command Registry.
+     * @param command The {@link com.kronosad.konverse.server.commands.ICommand} to register.
+     */
     public void registerCommand(ICommand command) {
         for (ICommand iCommand : commands) {
             if(command.getCommand().equalsIgnoreCase(iCommand.getCommand())) {
@@ -436,32 +503,59 @@ public class Server {
 
     /**
      * Returns an unmodifable list of {@link com.kronosad.konverse.server.commands.ICommand}.
-     * @return
+     * @return An immutable {@link java.util.List} of {@link com.kronosad.konverse.server.commands.ICommand}s.
      */
     public List<ICommand> getCommands() {
         return Collections.unmodifiableList(commands);
     }
 
+    /**
+     * Removes an {@link com.kronosad.konverse.server.commands.ICommand} from the Server's internal Command Registry.
+     * @param command The {@link com.kronosad.konverse.server.commands.ICommand} to remove.
+     */
     public void deregisterCommand(ICommand command) {
         commands.remove(command);
     }
 
+    /**
+     * Returns the {@link com.kronosad.konverse.common.objects.Version} of the Server.
+     * @return The {@link com.kronosad.konverse.common.objects.Version} of the Server.
+     */
     public Version getVersion() {
         return version;
     }
 
+    /**
+     * The {@link com.kronosad.konverse.common.auth.Authentication} that is being used by the Server to Authenticate all join requests.
+     * @return
+     */
     public Authentication getAuthenticator() {
         return authenticator;
     }
 
+    /**
+     * Is the Server using Authentication?
+     * @return {@link true} if The server is using Authentication, otherwise, returns {@link false}.
+     */
     public boolean isAuthenticationDisabled() { return authenticationDisabled; }
 
+    /**
+     * Returns the {@link com.kronosad.konverse.common.user.AuthenticatedUser} that the server is using for signing chat messages.
+     * @return The {@link com.kronosad.konverse.common.user.AuthenticatedUser} that the server is using for signing chat messages.
+     */
     public AuthenticatedUser getServerUser() { return serverUser; }
 
+    /**
+     * Don't use this...
+     */
     public static void main(String[] args) {
         new Server(args);
     }
 
+    /**
+     * Allows you to statically gain an instance to the running {@link com.kronosad.konverse.server.Server}.
+     * @return The currently running instance of {@link com.kronosad.konverse.server.Server}.
+     */
     public static Server getInstance() {
         return instance;
     }

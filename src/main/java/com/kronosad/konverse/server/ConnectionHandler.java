@@ -13,9 +13,7 @@ import java.net.Socket;
 import java.util.UUID;
 
 /**
- * User: russjr08
- * Date: 1/17/14
- * Time: 5:40 PM
+ * The Job of this class is to handle all incoming connections from the {@link com.kronosad.konverse.server.Server}!
  */
 public class ConnectionHandler implements Runnable {
     private Server server;
@@ -26,7 +24,7 @@ public class ConnectionHandler implements Runnable {
 
     private Thread manage;
 
-    public ConnectionHandler(Server server, Socket client) {
+    protected ConnectionHandler(Server server, Socket client) {
         this.server = server;
         this.client = client;
         prettyGson = new GsonBuilder().setPrettyPrinting().create();
