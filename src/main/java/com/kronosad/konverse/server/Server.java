@@ -29,9 +29,7 @@ import java.net.ServerSocket;
 import java.util.*;
 
 /**
- * User: russjr08
- * Date: 1/17/14
- * Time: 5:30 PM
+ * This is where the magic all happens.
  */
 public class Server {
 
