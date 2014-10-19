@@ -23,11 +23,6 @@
               <MenuItem fx:id="btnInvalidateCaches" mnemonicParsing="false" text="Invalidate Caches" />
             </items>
           </Menu>
-          <Menu mnemonicParsing="false" text=" ">
-            <items>
-              <MenuItem mnemonicParsing="false" text="About" />
-            </items>
-          </Menu>
         </menus>
       </MenuBar>
     </children>
