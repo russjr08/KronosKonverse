@@ -14,10 +14,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
@@ -50,7 +47,16 @@ public class ChatWindow implements Initializable, IMessageReceptor {
     private ListView<Text> userListView;
     private ObservableList<Text> userList = FXCollections.observableArrayList();
 
+    // Menu bar stuff
+    @FXML
+    private MenuBar menuBar;
+
+    // Menu bar buttons
+    @FXML private MenuItem btnClose;
+    @FXML private MenuItem btnInvalidateCaches;
+
     private Map<String, String> colorCaches = new HashMap<String, String>();
+    private List<User> onlineUsers;
 
     @Override
     public void handleMessage(ChatMessage message) {
@@ -65,6 +71,18 @@ public class ChatWindow implements Initializable, IMessageReceptor {
             }
         });
 
+    }
+
+    public void registerButtonHandlers() {
+        btnClose.setOnAction((actionEvent) -> {
+            System.exit(0);
+        });
+
+        btnInvalidateCaches.setOnAction((actionEvent) -> {
+            System.out.println("CLICKED!");
+            colorCaches.clear();
+            activateColorUsernames(onlineUsers);
+        });
     }
 
     public void appendText(String text) {
@@ -83,6 +101,7 @@ public class ChatWindow implements Initializable, IMessageReceptor {
         Platform.runLater(() -> {
 //            userList.clear();
 //            users.forEach((user) -> userList.add(getTextForUser(user))) ;
+            onlineUsers = users;
             activateColorUsernames(users);
 
         });
@@ -143,7 +162,7 @@ public class ChatWindow implements Initializable, IMessageReceptor {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         userListView.setItems(userList);
-
+        registerButtonHandlers();
     }
 
     @FXML

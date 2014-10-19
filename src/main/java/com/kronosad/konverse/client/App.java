@@ -39,7 +39,6 @@ public class App extends Application implements INetworkHandler {
 
     @Override
     public void start(Stage stage) throws Exception {
-
         params = this.getParameters();
         Platform.setImplicitExit(true);
 
