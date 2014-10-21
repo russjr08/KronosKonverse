@@ -92,7 +92,7 @@ public class ChatWindow implements Initializable, IMessageReceptor {
     @Override
     public void handlePrivateMessage(PrivateMessage message) {
         // TODO: Handle private messages :P
-        Platform.runLater(() -> appendText("[" + message.getUser().getUsername() + " -> " + App.getInstance().getLocalUser().getUsername() + "] " + message.getMessage() + "\n"));
+        Platform.runLater(() -> appendText("[" + message.getUser().getUsername() + " -> " + message.getRecipient().getUsername() + "] " + message.getMessage() + "\n"));
 
     }
 

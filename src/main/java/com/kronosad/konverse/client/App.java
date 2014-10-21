@@ -141,7 +141,11 @@ public class App extends Application implements INetworkHandler {
             case 2:
                 Packet02ChatMessage chatPacket = gson.fromJson(response, Packet02ChatMessage.class);
                 if(messageReceptor != null) {
-                    messageReceptor.handleMessage(chatPacket.getChat());
+                    if(chatPacket.isPrivate()) {
+                        messageReceptor.handlePrivateMessage(chatPacket.getPrivateMessage());
+                    }else {
+                        messageReceptor.handleMessage(chatPacket.getChat());
+                    }
                 }
                 break;
             case 3:
