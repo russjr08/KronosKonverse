@@ -159,7 +159,7 @@ public class App extends Application implements INetworkHandler {
                 if(messageReceptor instanceof ChatWindow) {
                     ChatWindow window = (ChatWindow)messageReceptor;
                     if(disconnect.getMessage() != null) {
-                        window.appendText("You were kicked from the server: " + disconnect.getMessage());
+                        window.appendText("You were kicked from the server: " + disconnect.getMessage() + "\n");
                     } else {
                         window.appendText("You were kicked form the server (No reason given).");
                     }

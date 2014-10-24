@@ -216,7 +216,6 @@ public class Server {
         boolean isCommand = false;
         String[] args = chat.getChat().getMessage().split(" ");
 
-        eventBus.post(new ChatReceivedEvent(chat));
 
         for(ICommand command : commands) {
             if(command.getCommand().equalsIgnoreCase(args[0])) {
@@ -250,6 +249,8 @@ public class Server {
                 e.printStackTrace();
             }
         }
+        eventBus.post(new ChatReceivedEvent(chat));
+
     }
 
     /**

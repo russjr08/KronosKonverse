@@ -70,7 +70,7 @@ public class CommandKick implements ICommand {
 
     @Override
     public void runFromConsole(String[] args) {
-        if(args.length != 2) {
+        if(args.length < 1) {
             System.err.println(getHelpText());
             return;
         }
@@ -82,7 +82,7 @@ public class CommandKick implements ICommand {
             StringBuilder reason = new StringBuilder();
             for (String arg : args) {
                 // Make sure we're not including the username in the reason...
-                if (arg.equals(args[0])) reason.append(arg + " ");
+                if (arg != null && !arg.equals(args[0])) reason.append(arg + " ");
             }
             Server.getInstance().getNetworkUserFromUser(user).disconnect(reason.toString(), true);
         });
