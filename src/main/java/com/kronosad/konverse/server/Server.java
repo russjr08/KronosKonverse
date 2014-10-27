@@ -344,11 +344,13 @@ public class Server {
      * @param text The String of text to send to the User.
      */
     public void sendMessageToClient(NetworkUser user, String text) {
-        ChatMessage message = new ChatMessage();
+        PrivateMessage message = new PrivateMessage();
         message.setUser(Server.getInstance().getServerUser());
         message.setMessage(text);
+        message.setRecipient(user);
         Packet02ChatMessage chatPacket = new Packet02ChatMessage(Packet.Initiator.SERVER, message);
         chatPacket.setPrivate(true);
+
 
         // Send it off, to just them.
         try {
