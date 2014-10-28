@@ -6,7 +6,7 @@ import com.kronosad.konverse.server.NetworkUser;
 import com.kronosad.konverse.server.Server;
 
 /**
- * Created by Russell Richardson.
+ * @author Russell Richardson
  */
 public class CommandStop implements ICommand {
     @Override

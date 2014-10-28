@@ -10,10 +10,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-/**
- * User: russjr08
- * Date: 1/17/14
- * Time: 5:43 PM
+ /**
+ * @author Russell Richardson
  */
 public class NetworkUser extends AuthenticatedUser {
 

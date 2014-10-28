@@ -4,7 +4,7 @@ import com.kronosad.konverse.common.packets.Packet02ChatMessage;
 import com.kronosad.konverse.server.Server;
 
 /**
- * Created by Russell Richardson.
+ * @author Russell Richardson
  */
 public class CommandHelp implements ICommand {
 

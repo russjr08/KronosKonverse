@@ -7,13 +7,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Russell Richardson.
+ * @author Russell Richardson
  */
 public class PluginManager {
 
     private List<IKonversePlugin> plugins = new ArrayList<>();
 
-    net.xeoh.plugins.base.PluginManager pm = PluginManagerFactory.createPluginManager();
+    net.xeoh.plugins.base.PluginManager pm;
 
     public void loadPlugins(File directory, Side side) {
         if(!directory.exists()) directory.mkdirs();
@@ -30,6 +30,8 @@ public class PluginManager {
     }
 
     public void initPlugin(File plugin, Side side) {
+        pm = PluginManagerFactory.createPluginManager();
+
         pm.addPluginsFrom(plugin.toURI());
         IKonversePlugin konversePlugin = pm.getPlugin(IKonversePlugin.class);
 

@@ -8,7 +8,7 @@ import com.kronosad.konverse.server.Server;
 import java.io.IOException;
 
 /**
- * Created by Russell Richardson.
+ * @author Russell Richardson
  */
 public class CommandAction implements ICommand {
 

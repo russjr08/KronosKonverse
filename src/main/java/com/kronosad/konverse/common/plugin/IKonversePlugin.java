@@ -3,7 +3,7 @@ package com.kronosad.konverse.common.plugin;
 import net.xeoh.plugins.base.Plugin;
 
 /**
- * Created by Russell Richardson.
+ * @author Russell Richardson
  */
 public interface IKonversePlugin extends Plugin {
 

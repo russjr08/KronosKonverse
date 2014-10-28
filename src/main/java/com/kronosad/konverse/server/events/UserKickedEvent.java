@@ -3,7 +3,7 @@ package com.kronosad.konverse.server.events;
 import com.kronosad.konverse.common.user.User;
 
 /**
- * Created by Russell Richardson.
+ * @author Russell Richardson
  */
 public class UserKickedEvent {
 

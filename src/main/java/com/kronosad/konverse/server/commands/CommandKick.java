@@ -5,7 +5,7 @@ import com.kronosad.konverse.common.user.User;
 import com.kronosad.konverse.server.Server;
 
 /**
- * Created by Russell Richardson.
+ * @author Russell Richardson
  */
 public class CommandKick implements ICommand {
 
