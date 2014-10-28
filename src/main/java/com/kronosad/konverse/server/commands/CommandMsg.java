@@ -27,11 +27,13 @@ public class CommandMsg implements ICommand {
 
         PrivateMessage msg = new PrivateMessage();
         for(User user : Server.getInstance().getOnlineUsers()) {
-            if(user.getUsername().equals(packet.getChat().getUser().getUsername())) {
-                Server.getInstance().sendMessageToClient(Server.getInstance().getNetworkUserFromUser(packet.getChat().getUser())
-                        , "Create yourself a note or something if you want to tell yourself something in private!");
-                return;
-            }
+
+            // TODO: Fix lazy fix.
+//            if(user.getUsername().equals(packet.getChat().getUser().getUsername())) {
+//                Server.getInstance().sendMessageToClient(Server.getInstance().getNetworkUserFromUser(packet.getChat().getUser())
+//                        , "Create yourself a note or something if you want to tell yourself something in private!");
+//                return;
+//            }
             if(user.getUsername().equals(args[0])) {
                 // Found the user!
                 StringBuilder builder = new StringBuilder();

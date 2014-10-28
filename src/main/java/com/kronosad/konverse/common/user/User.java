@@ -2,12 +2,7 @@ package com.kronosad.konverse.common.user;
 
 import com.google.gson.Gson;
 import com.kronosad.konverse.common.interfaces.INetworkable;
-
-/**
- * User: russjr08
- * Date: 1/17/14
- * Time: 4:20 PM
- */
+import com.kronosad.konverse.common.objects.ClientInfo;
 
 /**
  * Base User class, all Users should extend this class.
@@ -20,6 +15,8 @@ public class User implements INetworkable {
 
     protected boolean elevated = false;
 
+    protected ClientInfo clientInfo;
+
     /**
      * Gets the Username of the User.
      *
@@ -29,6 +26,22 @@ public class User implements INetworkable {
         return username;
     }
 
+    /**
+     * Returns the client info of the User.
+     * @return An instance of {@link com.kronosad.konverse.common.objects.ClientInfo}
+     * @see com.kronosad.konverse.common.objects.ClientInfo
+     */
+    public ClientInfo getClientInfo() {
+        return clientInfo;
+    }
+
+    /**
+     * Sets this User's client info.
+     * @param clientInfo This User's {@link com.kronosad.konverse.common.objects.ClientInfo}
+     */
+    public void setClientInfo(ClientInfo clientInfo) {
+        this.clientInfo = clientInfo;
+    }
 
     /**
      * Users who are elevated have additional permissions

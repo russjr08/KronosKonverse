@@ -1,5 +1,6 @@
 package com.kronosad.konverse.common.packets;
 
+import com.kronosad.konverse.common.objects.ClientInfo;
 import com.kronosad.konverse.common.objects.Version;
 
 /**
@@ -9,7 +10,7 @@ import com.kronosad.konverse.common.objects.Version;
  */
 
 /**
- * The Handshake Packet. The client sends this packet to the com.kronosad.konverse.server, which tells the com.kronosad.konverse.server to prepare a UUID for the user and
+ * The Handshake Packet. The client sends this packet to the Server, which tells theServer to prepare a UUID for the user and
  * prepare a User object to be sent back to them.
  */
 public class Packet00Handshake extends Packet {
@@ -17,8 +18,9 @@ public class Packet00Handshake extends Packet {
     private Version version;
     private String username;
     private String auth_token;
+    private ClientInfo clientInfo;
 
-    public Packet00Handshake(Initiator initiator, String username, String auth_token, Version version) {
+    public Packet00Handshake(Initiator initiator, String username, String auth_token, Version version, ClientInfo info) {
         super(Initiator.CLIENT, 0);
         if (initiator != Initiator.CLIENT) {
             throw new IllegalArgumentException("The Initiator of this Packet MUST be the client!");
@@ -28,6 +30,7 @@ public class Packet00Handshake extends Packet {
         this.auth_token = auth_token;
         this.username = username;
         this.version = version;
+        this.clientInfo = info;
 
     }
 
@@ -41,6 +44,10 @@ public class Packet00Handshake extends Packet {
 
     public String getAuthToken() {
         return auth_token;
+    }
+
+    public ClientInfo getClientInfo() {
+        return clientInfo;
     }
 
     public void setVersion(Version version) {

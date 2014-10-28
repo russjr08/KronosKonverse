@@ -2,6 +2,7 @@ package com.kronosad.konverse.server;
 
 import com.google.gson.Gson;
 import com.kronosad.konverse.common.objects.ChatMessage;
+import com.kronosad.konverse.common.objects.ClientInfo;
 import com.kronosad.konverse.common.packets.*;
 import com.kronosad.konverse.common.user.AuthenticatedUser;
 import com.kronosad.konverse.server.events.UserKickedEvent;
@@ -17,11 +18,12 @@ public class NetworkUser extends AuthenticatedUser {
 
     public transient Socket socket;
 
-    public NetworkUser(Socket socket, String name, String uuid, boolean elevated) {
+    public NetworkUser(Socket socket, String name, String uuid, boolean elevated, ClientInfo info) {
         this.socket = socket;
         this.username = name;
         this.uuid = uuid;
         this.elevated = elevated;
+        this.clientInfo = info;
     }
 
     public void setElevated(boolean elevate) {

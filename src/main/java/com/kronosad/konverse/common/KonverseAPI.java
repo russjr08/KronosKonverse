@@ -8,7 +8,7 @@ import com.kronosad.konverse.common.objects.Version;
  * Time: 6:36 PM
  */
 public class KonverseAPI {
-    public static final Version API_VERSION = new Version().setProtocol("2.0-BETA").setReadable("2.0 Beta");
+    public static final Version API_VERSION = new Version().setProtocol("2.01-BETA").setReadable("2.01 Beta");
     public static final String DEFAULT_AUTH_SERVER = "http://auth.kronosad.com";
 
     public static final String AUTHENTICATION_SUCCESSFUL = "Authentication Successful.";

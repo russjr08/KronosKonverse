@@ -85,7 +85,7 @@ public class Server {
             e.printStackTrace();
         }
 
-
+        System.out.println("Starting Konverse Server! (Version: " + getVersion().getReadable() + ")");
         System.out.println("Opening Server on port: " + args[0]);
 
         // Register commands.

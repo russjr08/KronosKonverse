@@ -102,7 +102,7 @@ public class LoginWindow implements Initializable {
         }
         lblStatus.setText("Connecting to server...");
 
-        Packet00Handshake handshake = new Packet00Handshake(Packet.Initiator.CLIENT, txtUsername.getText(), authToken, KonverseAPI.API_VERSION);
+        Packet00Handshake handshake = new Packet00Handshake(Packet.Initiator.CLIENT, txtUsername.getText(), authToken, KonverseAPI.API_VERSION, App.CLIENT_INFO);
         Packet05ConnectionStatus status;
 
         try {

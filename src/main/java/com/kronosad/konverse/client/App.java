@@ -4,8 +4,10 @@ import com.google.gson.Gson;
 import com.kronosad.konverse.client.interfaces.IMessageReceptor;
 import com.kronosad.konverse.client.notification.Notification;
 import com.kronosad.konverse.client.window.ChatWindow;
+import com.kronosad.konverse.common.KonverseAPI;
 import com.kronosad.konverse.common.interfaces.INetworkHandler;
 import com.kronosad.konverse.common.networking.Network;
+import com.kronosad.konverse.common.objects.ClientInfo;
 import com.kronosad.konverse.common.packets.*;
 import com.kronosad.konverse.common.user.AuthenticatedUser;
 import javafx.application.Application;
@@ -36,6 +38,8 @@ public class App extends Application implements INetworkHandler {
     private static App instance;
 
     private AuthenticatedUser user;
+
+    public static final ClientInfo CLIENT_INFO = new ClientInfo("Konverse JavaFX Client", KonverseAPI.API_VERSION);
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -116,7 +120,7 @@ public class App extends Application implements INetworkHandler {
                         chatWindow = loader.load();
                         Scene chatScene = new Scene(chatWindow);
                         stage.setScene(chatScene);
-                        stage.setTitle("You are live!");
+                        stage.setTitle("You are live! (Konverse Version: " + KonverseAPI.API_VERSION.getReadable() + ")");
                         stage.show();
                         stage.setResizable(true);
                         messageReceptor = (ChatWindow)loader.getController();

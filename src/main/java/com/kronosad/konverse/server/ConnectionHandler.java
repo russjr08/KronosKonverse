@@ -71,7 +71,15 @@ public class ConnectionHandler implements Runnable {
                             }
                         }
 
-                        user = new NetworkUser(client, username, UUID.randomUUID().toString(), shouldElevate);
+                        user = new NetworkUser(client, username, UUID.randomUUID().toString(), shouldElevate, handshake.getClientInfo());
+
+                        if(handshake.getClientInfo() == null) {
+                            System.out.println("Client " + username + " doesn't have any ClientInfo set! Disconnecting...");
+                            // TODO: Change this to it's own message sometime?
+                            user.sendStatus(Packet05ConnectionStatus.VERSION_MISMATCH, true);
+                            client.close();
+                            return;
+                        }
 
                         if(!server.isAuthenticationDisabled()) {
                             try {
@@ -138,7 +146,7 @@ public class ConnectionHandler implements Runnable {
                         } else {
 
                             System.err.println("Version mismatch! Disconnecting client!");
-                            server.users.add(user);
+//                            server.users.add(user);
                             user.sendStatus(Packet05ConnectionStatus.VERSION_MISMATCH, true);
 
                             if (!client.isClosed()) {

@@ -19,6 +19,8 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
 import javafx.scene.text.Text;
 import org.apache.commons.io.IOUtils;
 
@@ -66,7 +68,7 @@ public class ChatWindow implements Initializable, IMessageReceptor {
             }else {
                 appendText("[" + message.getUser().getUsername() + "] " + message.getMessage() + "\n");
             }
-            if(message.getMessage().contains(App.getInstance().getLocalUser().getUsername())) {
+            if(message.getMessage().contains(App.getInstance().getLocalUser().getUsername()) && !message.getUser().getUsername().equals(App.getInstance().getLocalUser().getUsername())) {
                 Notification.Notifier.INSTANCE.notifyInfo("Ping!", String.format("%s said your name in chat!", message.getUser().getUsername()));
             }
         });
@@ -111,6 +113,10 @@ public class ChatWindow implements Initializable, IMessageReceptor {
     public Text getTextForUser(User user) {
         Text text = new Text();
         text.setText(user.getUsername());
+
+        if(!user.getClientInfo().getCilentName().equals(App.CLIENT_INFO.getCilentName())) {
+            text.setFont(Font.font(text.getFont().getName(), FontPosture.ITALIC, text.getFont().getSize()));
+        }
 
         if(user.isElevated()) {
             text.setStyle("-fx-font-weight:bold;");
