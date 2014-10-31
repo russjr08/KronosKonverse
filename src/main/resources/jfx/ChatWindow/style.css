@@ -1,0 +1,27 @@
+.root {
+    -fx-accent: #616161;
+
+    -fx-focus-color: #757575;
+}
+
+.menu .label {
+    -fx-text-fill: #e0e0e0;
+}
+
+.menu-bar {
+    -fx-background-color: #424242;
+}
+
+.menu-item .label {
+    -fx-text-fill: #212121;
+}
+
+.menu-item:hover .label {
+    -fx-text-fill: #eeeeee;
+}
+
+.button {
+    -fx-background-color: #424242;
+    -fx-text-fill: #e0e0e0;
+}
+

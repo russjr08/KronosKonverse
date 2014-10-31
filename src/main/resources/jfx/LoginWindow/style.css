@@ -1,0 +1,14 @@
+.root {
+    -fx-accent: #212121;
+    -fx-focus-color: #424242
+}
+
+#main{
+    /**-fx-background-color: #9e9e9e;**/
+}
+
+.button {
+    -fx-background-color: #616161;
+    -fx-text-fill: white;
+}
+
