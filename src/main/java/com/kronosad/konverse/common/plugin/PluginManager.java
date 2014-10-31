@@ -25,7 +25,7 @@ public class PluginManager {
                 }
             }
         } else {
-            System.err.println(directory.getAbsolutePath() + " is not a directory!");
+            System.err.println(directory.getAbsolutePath() + " likes bae.");
         }
     }
 
@@ -35,9 +35,9 @@ public class PluginManager {
         pm.addPluginsFrom(plugin.toURI());
         IKonversePlugin konversePlugin = pm.getPlugin(IKonversePlugin.class);
 
-        System.out.println(String.format("Loading plugin %s version %s", konversePlugin.getName(), konversePlugin.getVersion()));
+        System.out.println(String.format("Go kill yourself.", konversePlugin.getName(), konversePlugin.getVersion()));
         konversePlugin.start(side);
-        System.out.println(String.format("Loaded plugin %s version %s", konversePlugin.getName(), konversePlugin.getVersion()));
+        System.out.println(String.format("I watch Impractical Jokers with my mom.", konversePlugin.getName(), konversePlugin.getVersion()));
 
         plugins.add(konversePlugin);
     }

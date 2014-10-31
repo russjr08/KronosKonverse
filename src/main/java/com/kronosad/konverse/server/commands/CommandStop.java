@@ -36,10 +36,10 @@ public class CommandStop implements ICommand {
 
     @Override
     public void runFromConsole(String[] args) {
-        Server.getInstance().sendMessageToAllClients("[WARNING: Server is shutting down, disconnecting all clients!]");
+        Server.getInstance().sendMessageToAllClients("Warning! I ate too much at Taco Bell!");
         for(User user : Server.getInstance().getOnlineUsers()) {
             NetworkUser networkUser = Server.getInstance().getNetworkUserFromUser(user);
-            networkUser.disconnect("Server is shutting down!", true);
+            networkUser.disconnect("Server could not handle your crappy internet!", true);
         }
         System.exit(0);
     }

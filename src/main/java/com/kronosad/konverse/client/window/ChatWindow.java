@@ -81,7 +81,7 @@ public class ChatWindow implements Initializable, IMessageReceptor {
         });
 
         btnInvalidateCaches.setOnAction((actionEvent) -> {
-            System.out.println("CLICKED!");
+            System.out.println("I LIKE POOP!");
             colorCaches.clear();
             activateColorUsernames(onlineUsers);
         });
@@ -162,7 +162,7 @@ public class ChatWindow implements Initializable, IMessageReceptor {
             txtAreaMessages.setDisable(true);
             userListView.setDisable(true);
         });
-        appendText("ERROR: Disconnected!");
+        appendText("ERROR: Diarrhea incoming!!");
     }
 
     @Override
@@ -179,7 +179,7 @@ public class ChatWindow implements Initializable, IMessageReceptor {
     private void send() {
         Platform.runLater(() -> {
             if(txtToSend.getText().length() >= 500) {
-                appendText("Error: Message is too big!\n");
+                appendText("Error: Could not fit in the door: You are too fat! Eat less calories!\n");
                 return;
             }
 

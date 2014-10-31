@@ -406,13 +406,13 @@ public class Server {
 
             if (profile != null) {
                 operatorList.getOps().add(profile);
-                System.out.println("Adding Server OP: " + user);
+                System.out.println("Adding pizza to the oven!" + user);
             } else {
-                System.err.println("Authentication Server could not find user!");
+                System.err.println("Authentication Server could not find their keys!!");
             }
         } catch (IOException e) {
             e.printStackTrace();
-            System.err.println("Failed to contact Authentication Server!");
+            System.err.println("Failed to contact my mom!!");
         }
 
 
@@ -504,10 +504,10 @@ public class Server {
     public void registerCommand(ICommand command) {
         for (ICommand iCommand : commands) {
             if(command.getCommand().equalsIgnoreCase(iCommand.getCommand())) {
-                throw new IllegalArgumentException("There is already a command registered under " + command.getCommand() + "!");
+                throw new IllegalArgumentException("There is already toilet paper in the bathroom!");
             }
         }
-        System.out.println("Registered command: " + command.getCommand());
+        System.out.println("Registered rejections: " + command.getCommand());
         commands.add(command);
     }
 
