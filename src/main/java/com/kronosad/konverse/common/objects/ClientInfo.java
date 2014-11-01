@@ -6,7 +6,7 @@ package com.kronosad.konverse.common.objects;
  */
 public class ClientInfo {
 
-    private String cilentName;
+    private String clientName;
     private Version clientVersion;
 
     /**
@@ -15,15 +15,15 @@ public class ClientInfo {
      * @param version The {@link com.kronosad.konverse.common.objects.Version} of the Client.
      */
     public ClientInfo(String name, Version version) {
-        this.cilentName = name;
+        this.clientName = name;
         this.clientVersion = version;
     }
 
     /**
      * @return The name of the Client.
      */
-    public String getCilentName() {
-        return cilentName;
+    public String getClientName() {
+        return clientName;
     }
 
     /**
