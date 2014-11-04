@@ -114,7 +114,7 @@ public class ChatWindow implements Initializable, IMessageReceptor {
         Text text = new Text();
         text.setText(user.getUsername());
 
-        if(!user.getClientInfo().getCilentName().equals(App.CLIENT_INFO.getCilentName())) {
+        if(!user.getClientInfo().getClientName().equals(App.CLIENT_INFO.getClientName())) {
             text.setFont(Font.font(text.getFont().getName(), FontPosture.ITALIC, text.getFont().getSize()));
         }
 
