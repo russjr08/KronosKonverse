@@ -18,11 +18,15 @@ public class CommandListUsers implements ICommand {
     public void run(String[] args, Packet02ChatMessage packet) {
         NetworkUser user = Server.getInstance().getNetworkUserFromUser(packet.getChat().getUser());
 
-        Server.getInstance().sendMessageToClient(user, "Here is a list of connected users");
+        StringBuilder builder = new StringBuilder();
         for(User connectedUser : Server.getInstance().getOnlineUsers()) {
-            Server.getInstance().sendMessageToClient(user, String.format("%s (%s - %s)", connectedUser.getUsername(),
+            builder.append(String.format("\n%s (%s - %s)", connectedUser.getUsername(),
                     connectedUser.getClientInfo().getClientName(), connectedUser.getClientInfo().getClientVersion().getReadable()));
         }
+
+        Server.getInstance().sendMessageToClient(user, "Here is a list of connected users:" + builder.toString());
+
+
     }
 
     @Override

@@ -56,10 +56,16 @@ public class App extends Application implements INetworkHandler {
         stage.setTitle("Login");
         stage.setScene(scene);
         stage.show();
-        stage.setResizable(false);
+//        stage.setResizable(false);
 
         stage.setOnCloseRequest((windowEvent) -> {
             System.out.println("Someone is closing me! D:");
+            try {
+                network.disconnect();
+            } catch (IOException e) {
+                e.printStackTrace();
+                System.err.println("Hmm.. Apparently we had a problem disconnecting!?");
+            }
             Platform.exit();
         });
 
