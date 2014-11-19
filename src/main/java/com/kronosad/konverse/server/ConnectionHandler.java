@@ -130,7 +130,8 @@ public class ConnectionHandler implements Runnable {
 
 
 
-                            System.out.println("User connected: " + user.getUsername());
+//                            System.out.println("User connected: " + user.getUsername());
+                            System.out.println(String.format("%s connected with IP: %s", user.getUsername(), user.getSocket().getInetAddress().toString()));
                             server.eventBus.post(new UserJoinedEvent(user));
                             server.users.add(user);
 
