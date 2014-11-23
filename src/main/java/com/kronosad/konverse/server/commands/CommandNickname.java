@@ -18,6 +18,19 @@ public class CommandNickname implements ICommand {
     @Override
     public void run(String[] args, Packet02ChatMessage packet) {
         if(args.length >= 1) {
+
+            if(args[0].isEmpty()) {
+                Server.getInstance().sendMessageToClient(Server.getInstance().getNetworkUserFromUser(packet.getChat().getUser())
+                        , "You can't have an empty nickname!");
+                return;
+            }
+
+            if(args[0].length() > 10) {
+                Server.getInstance().sendMessageToClient(Server.getInstance().getNetworkUserFromUser(packet.getChat().getUser())
+                        , "Your nickname is too long!");
+                return;
+            }
+
             Server.getInstance().getNetworkUserFromUser(packet.getChat().getUser()).setNickname(args[0]);
 
             try {
