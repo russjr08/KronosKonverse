@@ -63,13 +63,21 @@ public class ChatWindow implements Initializable, IMessageReceptor {
     @Override
     public void handleMessage(ChatMessage message) {
         Platform.runLater(() -> {
+            String username;
+
+            if(message.getUser().getNickname() != null) {
+                username = message.getUser().getNickname();
+            } else {
+                username = message.getUser().getUsername();
+            }
+
             if(message.isAction()) {
-                appendText("* " + message.getUser().getUsername() + " " + message.getMessage() + "\n");
+                appendText("* " + username + " " + message.getMessage() + "\n");
             }else {
-                appendText("[" + message.getUser().getUsername() + "] " + message.getMessage() + "\n");
+                appendText("[" + username + "] " + message.getMessage() + "\n");
             }
             if(message.getMessage().contains(App.getInstance().getLocalUser().getUsername()) && !message.getUser().getUsername().equals(App.getInstance().getLocalUser().getUsername())) {
-                Notification.Notifier.INSTANCE.notifyInfo("Ping!", String.format("%s said your name in chat!", message.getUser().getUsername()));
+                Notification.Notifier.INSTANCE.notifyInfo("Ping!", String.format("%s said your name in chat!", username));
             }
         });
 
@@ -112,14 +120,19 @@ public class ChatWindow implements Initializable, IMessageReceptor {
 
     public Text getTextForUser(User user) {
         Text text = new Text();
-        text.setText(user.getUsername());
 
-        if(!user.getClientInfo().getClientName().equals(App.CLIENT_INFO.getClientName())) {
-            text.setFont(Font.font(text.getFont().getName(), FontPosture.ITALIC, text.getFont().getSize()));
+        if(user.getNickname() != null) {
+            text.setText(String.format("%s [%s]", user.getNickname(), user.getUsername()));
+        }else {
+            text.setText(user.getUsername());
         }
 
         if(user.isElevated()) {
             text.setStyle("-fx-font-weight:bold;");
+        }
+
+        if(!user.getClientInfo().getClientName().equals(App.CLIENT_INFO.getClientName())) {
+            text.setFont(Font.font(text.getFont().getName(), FontPosture.ITALIC, text.getFont().getSize()));
         }
 
         return text;

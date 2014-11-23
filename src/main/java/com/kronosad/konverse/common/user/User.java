@@ -12,6 +12,7 @@ import com.kronosad.konverse.common.objects.ClientInfo;
 public class User implements INetworkable {
 
     protected String username;
+    protected String nickname;
 
     protected boolean elevated = false;
 
@@ -36,11 +37,27 @@ public class User implements INetworkable {
     }
 
     /**
+     * The nickname of this user (Can be null!)
+     * @return The nickname of this user.
+     */
+    public String getNickname() {
+        return nickname;
+    }
+
+    /**
      * Sets this User's client info.
      * @param clientInfo This User's {@link com.kronosad.konverse.common.objects.ClientInfo}
      */
     public void setClientInfo(ClientInfo clientInfo) {
         this.clientInfo = clientInfo;
+    }
+
+    /**
+     * Sets the nickname for this user.
+     * @param nickname The new nickname for this user.
+     */
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
     }
 
     /**

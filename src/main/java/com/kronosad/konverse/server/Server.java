@@ -97,6 +97,7 @@ public class Server {
         registerCommand(new CommandStop());
         registerCommand(new CommandMsg());
         registerCommand(new CommandListUsers());
+        registerCommand(new CommandNickname());
 
         try {
             server = new ServerSocket(Integer.valueOf(args[0]));
@@ -324,10 +325,18 @@ public class Server {
 
         sendPacketToClients(chatPacket);
 
+        updateUserList();
+
+    }
+
+    /**
+     * A utility method that broadcasts a list of users to all connected clients.
+     * @throws IOException Thrown if the broadcast was unsuccessful.
+     */
+    public void updateUserList() throws IOException {
         Packet03UserListChange changePacket = new Packet03UserListChange(Packet.Initiator.SERVER, getOnlineUsers());
 
         sendPacketToClients(changePacket);
-
     }
 
     /**

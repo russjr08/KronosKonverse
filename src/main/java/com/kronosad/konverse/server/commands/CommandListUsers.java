@@ -20,7 +20,13 @@ public class CommandListUsers implements ICommand {
 
         StringBuilder builder = new StringBuilder();
         for(User connectedUser : Server.getInstance().getOnlineUsers()) {
-            builder.append(String.format("\n%s (%s - %s)", connectedUser.getUsername(),
+            if(connectedUser.getNickname() != null) {
+                builder.append(String.format("\n[%s] ", connectedUser.getNickname()));
+            } else {
+                builder.append("\n");
+            }
+
+            builder.append(String.format("%s (%s - %s)", connectedUser.getUsername(),
                     connectedUser.getClientInfo().getClientName(), connectedUser.getClientInfo().getClientVersion().getReadable()));
         }
 
