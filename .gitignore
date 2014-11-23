@@ -72,3 +72,14 @@ release.properties
 
 ## Vim
 *.swp
+
+# JavaDocs
+docs/
+
+## Konverse files
+ops.json
+plugins/
+
+
+# Other files...
+run.sh
