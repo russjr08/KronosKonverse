@@ -47,8 +47,12 @@ public class CommandKick implements ICommand {
                     // Make sure we're not including the username in the reason...
                     if (arg != null && !arg.equals(args[0])) reason.append(arg + " ");
                 }
+
+                reason.append(String.format("(%s)", packet.getChat().getUser().getUsername()));
+
                 Server.getInstance().getNetworkUserFromUser(user).disconnect(reason.toString(), true);
-                Server.getInstance().sendMessageToAllClients(String.format("%s was kicked for: %s", user.getUsername(), reason.toString()));
+                Server.getInstance().sendMessageToAllClients(String.format("%s was kicked by %s for: %s", user.getUsername(),
+                        packet.getChat().getUser().getUsername(), reason.toString()));
 
             }
         }
@@ -84,7 +88,14 @@ public class CommandKick implements ICommand {
                 // Make sure we're not including the username in the reason...
                 if (arg != null && !arg.equals(args[0])) reason.append(arg + " ");
             }
+
+            reason.append("(Server)");
+
+
             Server.getInstance().getNetworkUserFromUser(user).disconnect(reason.toString(), true);
+
+            Server.getInstance().sendMessageToAllClients(String.format("%s was kicked by Server for: %s", user.getUsername(),
+                    reason.toString()));
         });
     }
 
