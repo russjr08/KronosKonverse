@@ -11,12 +11,14 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
 
- /**
+/**
  * @author Russell Richardson
  */
 public class NetworkUser extends AuthenticatedUser {
 
     public transient Socket socket;
+
+    public String lastMessage;
 
     public NetworkUser(Socket socket, String name, String uuid, boolean elevated, ClientInfo info) {
         this.socket = socket;

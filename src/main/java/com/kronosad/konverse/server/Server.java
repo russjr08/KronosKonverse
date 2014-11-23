@@ -245,7 +245,15 @@ public class Server {
         }
 
         if(!isCommand){
+            NetworkUser user = getNetworkUserFromUser(chat.getChat().getUser());
+
+            if(user.lastMessage != null && user.lastMessage.equals(chat.getMessage())) {
+                sendMessageToClient(user, "Sorry, you can't repeat messages!");
+                return;
+            }
+
             try {
+                user.lastMessage = chat.getMessage();
                 sendPacketToClients(chat);
             } catch (IOException e) {
                 e.printStackTrace();
