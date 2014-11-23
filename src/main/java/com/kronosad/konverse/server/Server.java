@@ -218,6 +218,8 @@ public class Server {
         boolean isCommand = false;
         String[] args = chat.getChat().getMessage().split(" ");
 
+        // Just in case the client is trying to change their identity...
+        chat.getChat().setUser(getNetworkUserFromUser(chat.getChat().getUser()));
 
         for(ICommand command : commands) {
             if(command.getCommand().equalsIgnoreCase(args[0])) {
@@ -226,8 +228,6 @@ public class Server {
                     tempArgs.add(arg);
                 }
                 tempArgs.remove(0);
-                // Just in case the client is trying to change their identity...
-                chat.getChat().setUser(getNetworkUserFromUser(chat.getChat().getUser()));
 
                 if(command.requiresElevation() && !chat.getChat().getUser().isElevated()) {
                     sendMessageToClient(getNetworkUserFromUser(chat.getChat().getUser()),

@@ -19,13 +19,20 @@ public class CommandNickname implements ICommand {
     public void run(String[] args, Packet02ChatMessage packet) {
         if(args.length >= 1) {
             Server.getInstance().getNetworkUserFromUser(packet.getChat().getUser()).setNickname(args[0]);
+
             try {
-                Server.getInstance().updateUserList();
+                Server.getInstance().updateUserList(); // Broadcast updated nickname.
             } catch (IOException e) {
                 e.printStackTrace();
             }
         } else {
             Server.getInstance().getNetworkUserFromUser(packet.getChat().getUser()).setNickname(null);
+
+            try {
+                Server.getInstance().updateUserList(); // Broadcast updated nickname.
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 

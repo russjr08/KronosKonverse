@@ -89,7 +89,6 @@ public class ChatWindow implements Initializable, IMessageReceptor {
         });
 
         btnInvalidateCaches.setOnAction((actionEvent) -> {
-            System.out.println("CLICKED!");
             colorCaches.clear();
             activateColorUsernames(onlineUsers);
         });
