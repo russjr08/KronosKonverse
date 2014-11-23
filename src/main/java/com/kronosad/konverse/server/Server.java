@@ -39,6 +39,7 @@ public class Server {
     private Version version = KonverseAPI.API_VERSION;
     private Authentication authenticator;
     private PluginManager manager = new PluginManager();
+    private CommandMute muteCommand = new CommandMute();
 
     protected AuthenticatedUser serverUser;
 
@@ -98,6 +99,7 @@ public class Server {
         registerCommand(new CommandMsg());
         registerCommand(new CommandListUsers());
         registerCommand(new CommandNickname());
+        registerCommand(muteCommand);
 
         try {
             server = new ServerSocket(Integer.valueOf(args[0]));
@@ -218,6 +220,14 @@ public class Server {
         boolean isCommand = false;
         String[] args = chat.getChat().getMessage().split(" ");
 
+        if(args.length < 1) {
+            sendMessageToClient(getNetworkUserFromUser(chat.getChat().getUser()),"Don't send empty messages, silly!");
+            return;
+        }
+        if(muteCommand.mutedUsers.contains(chat.getChat().getUser().getUsername())) {
+            sendMessageToClient(getNetworkUserFromUser(chat.getChat().getUser()), "You are muted!");
+            return;
+        }
 
         for(ICommand command : commands) {
             if(command.getCommand().equalsIgnoreCase(args[0])) {
