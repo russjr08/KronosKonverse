@@ -4,11 +4,14 @@ import com.kronosad.konverse.common.packets.Packet02ChatMessage;
 import com.kronosad.konverse.server.Server;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * @author Russell Richardson
  */
 public class CommandNickname implements ICommand {
+
+    String[] blockedNicknames = {"Server", "[]", "{}"};
 
     @Override
     public String getCommand() {
@@ -19,7 +22,13 @@ public class CommandNickname implements ICommand {
     public void run(String[] args, Packet02ChatMessage packet) {
         if(args.length >= 1) {
 
-            if(args[0].isEmpty()) {
+            if(Arrays.asList(blockedNicknames).contains(args[0])) {
+                Server.getInstance().sendMessageToClient(Server.getInstance().getNetworkUserFromUser(packet.getChat().getUser())
+                        , "That is a blocked nickname!");
+                return;
+            }
+
+            if(args[0] == null || args[0].isEmpty()) {
                 Server.getInstance().sendMessageToClient(Server.getInstance().getNetworkUserFromUser(packet.getChat().getUser())
                         , "You can't have an empty nickname!");
                 return;
