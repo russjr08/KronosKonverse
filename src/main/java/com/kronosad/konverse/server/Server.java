@@ -45,6 +45,8 @@ public class Server {
     protected List<NetworkUser> users = new ArrayList<NetworkUser>();
     protected List<ICommand> commands = new ArrayList<>();
 
+    private CommandMute muteCommand = new CommandMute();
+
     protected boolean running = false;
     private boolean authenticationDisabled = false;
 
@@ -98,6 +100,7 @@ public class Server {
         registerCommand(new CommandMsg());
         registerCommand(new CommandListUsers());
         registerCommand(new CommandNickname());
+        registerCommand(muteCommand);
 
         try {
             server = new ServerSocket(Integer.valueOf(args[0]));
@@ -218,6 +221,14 @@ public class Server {
         boolean isCommand = false;
         String[] args = chat.getChat().getMessage().split(" ");
 
+        if(args.length < 1) {
+            sendMessageToClient(getNetworkUserFromUser(chat.getChat().getUser()),"Don't send empty messages, silly!");
+            return;
+        }
+        if(muteCommand.mutedUsers.contains(chat.getChat().getUser().getUsername())) {
+            sendMessageToClient(getNetworkUserFromUser(chat.getChat().getUser()), "You are muted!");
+            return;
+        }
 
         for(ICommand command : commands) {
             if(command.getCommand().equalsIgnoreCase(args[0])) {
