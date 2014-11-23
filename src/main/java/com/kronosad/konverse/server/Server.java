@@ -46,7 +46,9 @@ public class Server {
     protected List<ICommand> commands = new ArrayList<>();
 
     protected boolean running = false;
+
     private boolean authenticationDisabled = false;
+    private boolean nicknamesDisabled = false;
 
     protected static Server instance;
 
@@ -66,6 +68,10 @@ public class Server {
                 System.err.println("WARNING: You've chosen to disable authentication, this can allow any unverified" +
                         " user to connect with whatever (or no) credentials. It's recommended you leave authentication" +
                         " turned on!");
+            }
+            if (string.contains("--disable-nicknames")) {
+                System.err.println("Warning: Nicknames disabled.");
+                nicknamesDisabled = true;
             }
         }
 
@@ -97,7 +103,10 @@ public class Server {
         registerCommand(new CommandStop());
         registerCommand(new CommandMsg());
         registerCommand(new CommandListUsers());
-        registerCommand(new CommandNickname());
+
+        if(!nicknamesDisabled) {
+            registerCommand(new CommandNickname());
+        }
 
         try {
             server = new ServerSocket(Integer.valueOf(args[0]));
