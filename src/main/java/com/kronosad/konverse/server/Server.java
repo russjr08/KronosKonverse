@@ -46,9 +46,7 @@ public class Server {
     protected List<ICommand> commands = new ArrayList<>();
 
     protected boolean running = false;
-
     private boolean authenticationDisabled = false;
-    private boolean nicknamesDisabled = false;
 
     protected static Server instance;
 
@@ -68,10 +66,6 @@ public class Server {
                 System.err.println("WARNING: You've chosen to disable authentication, this can allow any unverified" +
                         " user to connect with whatever (or no) credentials. It's recommended you leave authentication" +
                         " turned on!");
-            }
-            if (string.contains("--disable-nicknames")) {
-                System.err.println("Warning: Nicknames disabled.");
-                nicknamesDisabled = true;
             }
         }
 
@@ -103,10 +97,7 @@ public class Server {
         registerCommand(new CommandStop());
         registerCommand(new CommandMsg());
         registerCommand(new CommandListUsers());
-
-        if(!nicknamesDisabled) {
-            registerCommand(new CommandNickname());
-        }
+        registerCommand(new CommandNickname());
 
         try {
             server = new ServerSocket(Integer.valueOf(args[0]));
@@ -227,8 +218,6 @@ public class Server {
         boolean isCommand = false;
         String[] args = chat.getChat().getMessage().split(" ");
 
-        // Just in case the client is trying to change their identity...
-        chat.getChat().setUser(getNetworkUserFromUser(chat.getChat().getUser()));
 
         for(ICommand command : commands) {
             if(command.getCommand().equalsIgnoreCase(args[0])) {
@@ -237,6 +226,8 @@ public class Server {
                     tempArgs.add(arg);
                 }
                 tempArgs.remove(0);
+                // Just in case the client is trying to change their identity...
+                chat.getChat().setUser(getNetworkUserFromUser(chat.getChat().getUser()));
 
                 if(command.requiresElevation() && !chat.getChat().getUser().isElevated()) {
                     sendMessageToClient(getNetworkUserFromUser(chat.getChat().getUser()),
@@ -254,15 +245,7 @@ public class Server {
         }
 
         if(!isCommand){
-            NetworkUser user = getNetworkUserFromUser(chat.getChat().getUser());
-
-            if(user.lastMessage != null && user.lastMessage.equals(chat.getMessage())) {
-                sendMessageToClient(user, "Sorry, you can't repeat messages!");
-                return;
-            }
-
             try {
-                user.lastMessage = chat.getMessage();
                 sendPacketToClients(chat);
             } catch (IOException e) {
                 e.printStackTrace();

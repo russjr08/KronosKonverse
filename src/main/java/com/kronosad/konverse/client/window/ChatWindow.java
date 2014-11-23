@@ -98,6 +98,7 @@ public class ChatWindow implements Initializable, IMessageReceptor {
         Platform.runLater(() -> txtAreaMessages.appendText(text));
     }
 
+
     @Override
     public void handlePrivateMessage(PrivateMessage message) {
         // TODO: Handle private messages :P
