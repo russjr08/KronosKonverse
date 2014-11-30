@@ -15,6 +15,7 @@ public class KonverseAPI {
     public static final String AUTHENTICATION_FAILED = "Authentication Failed.";
     public static final String AUTHENTICATION_TOKEN_VALID = "Authentication Token is valid.";
     public static final String AUTHENTICATION_TOKEN_INVALID = "Authentication Token is invalid.";
+    public static final String AUTHENTICATION_ACCOUNT_DISABLED = "Account is disabled.";
 
     public static final String AUTHENTICATION_PROFILE_USER_FOUND = "User exists.";
 

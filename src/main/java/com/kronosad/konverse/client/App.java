@@ -60,12 +60,16 @@ public class App extends Application implements INetworkHandler {
 
         stage.setOnCloseRequest((windowEvent) -> {
             System.out.println("Someone is closing me! D:");
-            try {
-                network.disconnect();
-            } catch (IOException e) {
-                e.printStackTrace();
-                System.err.println("Hmm.. Apparently we had a problem disconnecting!?");
+
+            if(network != null) {
+                try {
+                    network.disconnect();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    System.err.println("Hmm.. Apparently we had a problem disconnecting!?");
+                }
             }
+
             Platform.exit();
         });
 

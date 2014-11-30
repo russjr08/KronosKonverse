@@ -95,9 +95,16 @@ public class LoginWindow implements Initializable {
             return;
         } catch (AuthenticationFailedException e) {
             e.printStackTrace();
-            lblStatus.setText("Local Authentication Failed!");
-            btnConnect.setDisable(false);
-            progress.setDisable(true);
+
+            if(e.getMessage().equalsIgnoreCase("Account is disabled!")) {
+                lblStatus.setText("You are not allowed to login at this time.");
+            } else {
+                lblStatus.setText("Local Authentication Failed!");
+                btnConnect.setDisable(false);
+                progress.setDisable(true);
+            }
+
+
             return;
         }
         lblStatus.setText("Connecting to server...");

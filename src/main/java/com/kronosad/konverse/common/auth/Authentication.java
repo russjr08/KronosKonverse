@@ -67,6 +67,8 @@ public class Authentication {
         // Check to see if login was successful or not.
         if (message.getMessage().equalsIgnoreCase(KonverseAPI.AUTHENTICATION_SUCCESSFUL)) {
             return new Gson().fromJson(resultingJson, AuthenticationLoggedInMessage.class);
+        } else if(message.getMessage().equalsIgnoreCase(KonverseAPI.AUTHENTICATION_ACCOUNT_DISABLED)) {
+            throw new AuthenticationFailedException("Account is disabled!");
         } else {
             throw new AuthenticationFailedException("Authentication Server returned: " + message.getMessage());
         }
