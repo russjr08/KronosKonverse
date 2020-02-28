@@ -109,10 +109,11 @@ public class ChatWindow implements Initializable, IMessageReceptor {
     @Override
     public void handleUserListChange(List<User> users) {
         Platform.runLater(() -> {
-//            userList.clear();
-//            users.forEach((user) -> userList.add(getTextForUser(user))) ;
+            userList.clear();
+            users.forEach((user) -> userList.add(getTextForUser(user)));
             onlineUsers = users;
-            activateColorUsernames(users);
+            // TODO: Get colors service back up and running, and don't hang when service is down.
+//            activateColorUsernames(users);
 
         });
 
