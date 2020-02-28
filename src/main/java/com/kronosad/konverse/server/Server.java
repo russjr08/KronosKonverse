@@ -61,7 +61,11 @@ public class Server {
         // Check authentication flags.
         for (String string : args) {
             if (string.contains("--auth-server=")) {
-                authenticator = new Authentication(string.split("=")[0]);
+                String authServer = string.split("=")[1];
+                if(!authServer.endsWith("/")) {
+                    authServer = authServer + "/";
+                }
+                authenticator = new Authentication(authServer);
             }
             if (string.contains("--no-auth")) {
                 authenticationDisabled = true;
