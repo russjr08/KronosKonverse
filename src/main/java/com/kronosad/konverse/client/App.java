@@ -18,6 +18,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.Objects;
 
 /**
  * Author russjr08
@@ -49,7 +50,7 @@ public class App extends Application implements INetworkHandler {
         instance = this;
         this.stage = stage;
 
-        Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("jfx/LoginWindow/LoginWindow.fxml"));
+        Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/jfx/LoginWindow/LoginWindow.fxml")));
 
         Scene scene = new Scene(root);
 
