@@ -3,13 +3,13 @@ package com.kronosad.konverse.common.auth;
 import com.google.gson.Gson;
 import com.kronosad.konverse.common.KonverseAPI;
 import com.kronosad.konverse.common.auth.exceptions.AuthenticationFailedException;
+import okhttp3.*;
 import org.apache.commons.io.IOUtils;
-import org.apache.http.client.fluent.Form;
-import org.apache.http.client.fluent.Request;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Objects;
 
 /**
  * A utility class for contacting an Authentication Server to login / verify a user's identity. You do not have to use
@@ -20,6 +20,7 @@ import java.net.URL;
 public class Authentication {
 
     private String auth_server;
+    private OkHttpClient client;
 
     /**
      * Sets up an authentication object using the default authentication server.
@@ -40,6 +41,7 @@ public class Authentication {
      */
     public Authentication(String server) {
         this.auth_server = server;
+        this.client = new OkHttpClient();
     }
 
     /**
@@ -56,11 +58,23 @@ public class Authentication {
      *                                       by the Authentication Server.
      */
     public AuthenticationLoggedInMessage login(String username, String password) throws IOException, AuthenticationFailedException {
-        String resultingJson = Request.Post(auth_server + "/api/login/")
-                .bodyForm(Form.form().add("username", username).add("password", password).build())
-                .execute()
-                .returnContent()
-                .toString();
+//        String resultingJson = Request.Post(auth_server + "/api/login/")
+//                .bodyForm(Form.form().add("username", username).add("password", password).build())
+//                .execute()
+//                .returnContent()
+//                .toString();
+
+        RequestBody formBody = new FormBody.Builder()
+                .add("username", username)
+                .add("password", password).build();
+        Request request = new okhttp3.Request.Builder().url(this.auth_server + "api/login/").post(formBody).build();
+        Response response = client.newCall(request).execute();
+
+        if(!response.isSuccessful()) {
+            throw new IOException("Unexpected network error while authenticating: " + response);
+        }
+
+        String resultingJson = Objects.requireNonNull(response.body()).string();
 
         AuthenticationMessage message = new Gson().fromJson(resultingJson, AuthenticationMessage.class);
 
@@ -87,11 +101,23 @@ public class Authentication {
      * @throws IOException Thrown if there was an error contacting the Authentication Server.
      */
     public boolean verifyAuthToken(String username, String token) throws IOException {
-        String resultingJson = Request.Post(auth_server + "/api/check_token/")
-                .bodyForm(Form.form().add("username", username).add("auth_token", token).build())
-                .execute()
-                .returnContent()
-                .toString();
+//        String resultingJson = Request.Post(auth_server + "/api/check_token/")
+//                .bodyForm(Form.form().add("username", username).add("auth_token", token).build())
+//                .execute()
+//                .returnContent()
+//                .toString();
+
+        RequestBody formBody = new FormBody.Builder()
+                .add("username", username)
+                .add("auth_token", token).build();
+        Request request = new okhttp3.Request.Builder().url(this.auth_server + "api/check_token/").post(formBody).build();
+        Response response = client.newCall(request).execute();
+
+        if(!response.isSuccessful()) {
+            throw new IOException("Unexpected network error while authenticating: " + response);
+        }
+
+        String resultingJson = Objects.requireNonNull(response.body()).string();
 
         AuthenticationMessage message = new Gson().fromJson(resultingJson, AuthenticationMessage.class);
 
@@ -99,7 +125,7 @@ public class Authentication {
     }
 
     public AuthenticatedUserProfile getUserProfile(String username) throws IOException {
-        InputStream is = new URL(auth_server + "/api/get_user/" + username).openStream();
+        InputStream is = new URL(auth_server + "api/get_user/" + username).openStream();
         String response = IOUtils.toString(is);
         AuthenticationMessage msg = new Gson().fromJson(response, AuthenticationMessage.class);
         if (msg.getMessage().equals(KonverseAPI.AUTHENTICATION_PROFILE_USER_FOUND)) {
